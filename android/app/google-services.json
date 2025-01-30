@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "723476055143",
+    "project_id": "xkop-officer",
+    "storage_bucket": "xkop-officer.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:723476055143:android:df379a31cafb60c7ec80c2",
+        "android_client_info": {
+          "package_name": "com.xkopconsultancy.xkop_officer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrXEOSnogdjDJXZ9FaKgyX4VxEU2S_Lbo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
