@@ -149,7 +149,7 @@ const AudioScreen = ({ route, navigation }) => {
               <SvgXml xml={SVG_request_video} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={toggleMute}>
-              {isMuted ? <SvgXml xml={SVG_mute_mic} /> : <SvgXml xml={SVG_unmute_mic} />}
+              {isMuted ?  <SvgXml xml={SVG_unmute_mic} /> : <SvgXml xml={SVG_mute_mic} />}
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={toggleSpeaker}>
               {isSpeakerEnabled ? <SvgXml xml={SVG_speaker} /> : <SvgXml xml={SVG_speakeroff} />}
