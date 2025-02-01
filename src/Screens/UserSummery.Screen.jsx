@@ -152,12 +152,12 @@ const UserSummeryScreen = ({route, navigation}) => {
 
   return (
     <PaperProvider>
-      <View className="relative flex-1 h-full">
-        <View className="p-6 flex flex-wrap flex-row justify-between w-full">
+      <View className="relative flex-1 h-full px-4  bg-white">
+        <View className="py-3 flex flex-wrap flex-row justify-between w-full">
           <Icon
             name="arrowleft"
             color="#000"
-            size={20}
+            size={28}
             onPress={() => navigation.goBack()}
             className="w-1/2"
           />
@@ -184,7 +184,7 @@ const UserSummeryScreen = ({route, navigation}) => {
           </Text>
         </View>
 
-        <View className="flex flex-wrap flex-row pl-6 pr-6 pb-2 justify-between w-full">
+        <View className="flex flex-wrap flex-row  pb-2 justify-between w-full">
           <Text className="text-black font-bold w-1/2">Summary</Text>
           <Text
             className="text-blue-600 font-medium text-right border-b border-blue-600"
@@ -192,18 +192,17 @@ const UserSummeryScreen = ({route, navigation}) => {
             Edit
           </Text>
         </View>
-        <Text className="text-black pl-6 pr-6">
-          {summary != ''
-            ? summary
-            : `Lorem ipsum dolor sit amet, consectetur
-                adipiscing elit, sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud`}
-        </Text>
+        <View className="flex items-center">
+          <Text className="text-black">
+            {summary
+              ? summary
+              : `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.`}
+          </Text>
+        </View>
 
         <Text className="border-b border-gray-500 h-2 w-full p-2"></Text>
 
-        <View className="flex flex-wrap flex-row p-6 justify-between w-full">
+        <View className="flex flex-wrap flex-row py-4 justify-between w-full">
           <Text className="text-black font-bold w-1/2">Media</Text>
           <Text
             className="text-blue-600 font-medium text-right border-b border-blue-600"
@@ -212,7 +211,7 @@ const UserSummeryScreen = ({route, navigation}) => {
           </Text>
         </View>
 
-        <View className="checklistWrappper text-left pl-6 pt-3 pb-5">
+        <View className="checklistWrappper text-left pb-4">
           <RadioButton.Group
             onValueChange={newValue => setDocumentType(newValue)}
             value={documentType}>
@@ -228,11 +227,9 @@ const UserSummeryScreen = ({route, navigation}) => {
                 ))}
               </View>
             ) : (
-              <View className="pb-0 flex flex-wrap items-center gap-6 justify-between flex-row w-full">
-                <Text className="text-black text-base font-medium">
-                  <Icon3 name="file-pdf-o" color="#000" size={20} />
-                  Empty
-                </Text>
+              <View className="pb-0 flex gap-2 justify-start items-start  flex-row w-full">
+                <Icon3 name="file-pdf-o" color="#000" size={20} />
+                <Text className="text-black text-base font-medium ">Empty</Text>
               </View>
             )}
 
@@ -253,7 +250,7 @@ const UserSummeryScreen = ({route, navigation}) => {
 
         <Text className="border-b border-gray-500 h-2 w-full"></Text>
 
-        <View className="flex flex-wrap flex-row p-6 justify-between w-full">
+        <View className="flex flex-wrap flex-row  py-4 justify-between w-full">
           <Text className="text-black font-bold w-1/2">Notes</Text>
           <Text
             className="text-blue-600 font-medium text-right border-b border-blue-600"
@@ -266,7 +263,7 @@ const UserSummeryScreen = ({route, navigation}) => {
         </Text>
 
         <View className="absolute bottom-0 w-full">
-          <TouchableHighlight className="ml-6 mr-6">
+          <TouchableHighlight className="mx-6">
             <View className="flex justify-center items-center bg-red-800 py-4 rounded-lg">
               <Text
                 className="text-white text-[18px] font-bold"

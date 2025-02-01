@@ -8,6 +8,7 @@ import {
   Platform,
   Vibration,
   StyleSheet,
+  Dimensions,
   ActivityIndicator,
   Modal,
 } from 'react-native';
@@ -21,6 +22,7 @@ import requestCameraAndAudioPermission from '../Components/permissions';
 import {useWebSocket} from './../shared/WebSocketProvider.jsx';
 import {getScheduleAll} from '../Api/ScheduleService.js';
 import AppointmnetListModel from '../Components/AppointmnetListModel.jsx';
+const { width } = Dimensions.get('window');
 
 const HomeScreen = ({navigation}) => {
   const {callReceiver, userInfo, leave, processAccept} = useWebSocket();
@@ -255,7 +257,7 @@ const CallCard = ({userInfo, onAccept, onReject, user}) => {
             style={styles.avatar}
           />
           <View>
-            <Text style={styles.cardName}>{userInfo?.name}</Text>
+            <Text style={styles.cardName} numberOfLines={1} ellipsizeMode="tail">{userInfo?.name}</Text>
             <Text style={styles.cardDetail}>
               {user?.officerDetails?.ConsultationTypeID?.ConsultationTypeName}
             </Text>
@@ -399,41 +401,50 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   card: {
-    marginVertical: 8,
     backgroundColor: '#fff',
     borderColor: '#D9D9D9',
     borderWidth: 2,
+    borderRadius: 8,
+    // paddingHorizontal: width * 0.04, // Dynamic padding
   },
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    justifyContent: 'center',
+    paddingHorizontal: width * 0.04,
   },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: width * 0.13, // Scales dynamically
+    height: width * 0.13,
+    borderRadius: width * 0.065,
   },
   cardName: {
-    fontSize: 14,
+    fontSize: width * 0.04,
+    paddingLeft:width * 0.01,
     fontWeight: '500',
     color: '#000',
   },
   cardDetail: {
-    fontSize: 12,
+    fontSize: width * 0.035,
+    paddingLeft:width * 0.01,
     fontWeight: '400',
     color: '#000',
   },
   cardNote: {
-    fontSize: 14,
+    fontSize: width * 0.035,
+    paddingLeft:width * 0.01,
     fontWeight: '400',
     color: '#000',
   },
   cardActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingLeft: 16,
+    gap: width * 0.02,
+    paddingLeft: width * 0.04,
+  },
+  actionIcon: {
+    width: width * 0.1, 
+    height: width * 0.1,
   },
   cardFooter: {
     flexDirection: 'row',

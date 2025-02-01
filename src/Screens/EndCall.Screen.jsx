@@ -6,7 +6,7 @@ const EndCallScreen = ({route,navigation }) => {
     const { chatId,userInfo } = route.params;
 
     return (
-        <View className="flex-1 flex justify-center items-center h-[100vh] relative">
+        <View className="flex-1 flex justify-center items-center h-[100vh] relative px-4">
             <View className="border-2 border-yellow-600	rounded-full relative">
                 <View className="w-4 h-4 rounded-full bg-gray-400 absolute top-0 right-0"></View>
                 <View className="w-[100px] h-[100px] rounded-full bg-yellow-600 p-7 m-5 shadow-lg shadow-gray-500/50">
