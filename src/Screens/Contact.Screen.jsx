@@ -54,7 +54,7 @@ const ContactScreen = () => {
   const displayedChats = [...(matchedChats || []), ...(otherChats || [])];
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: 'transparent'}}>
       <View>
         <Text
           style={{
@@ -76,10 +76,10 @@ const ContactScreen = () => {
             borderRadius: 10,
             borderWidth: 1,
             borderColor: '#fff',
-            backgroundColor: '#F6F6F6',
+            backgroundColor: '#fff',
           }}>
           <Searchbar
-            style={{flex: 1, backgroundColor: '#F6F6F6'}}
+            style={{flex: 1, backgroundColor: 'transparent'}}
             placeholder="Search"
             onChangeText={setSearchQuery}
             value={searchQuery}

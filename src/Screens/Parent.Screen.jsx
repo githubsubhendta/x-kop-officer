@@ -126,6 +126,7 @@ const ParentScreen = ({navigation}) => {
           paddingHorizontal: 5,
           paddingTop: 0,
           position: 'absolute',
+          backgroundColor:'transparent',
         },
       })}
       tabBar={props => (
@@ -158,7 +159,7 @@ const ParentScreen = ({navigation}) => {
         options={{
           headerShown: false,
           tabBarIcon: ({color, size}) => (
-            <View>
+            <View >
               <SvgXml xml={SVG_chat} width={'100px'} height={'30px'} />
             </View>
           ),
@@ -238,7 +239,7 @@ const TabBarWithBorder = ({state, descriptors, navigation, selectedTab}) => {
                     size: 24,
                   })}
                   {route.name === selectedTab && (
-                    <View className="bg-orange-900 rounded-tl-full rounded-tr-full px-5 h-2 text-center flex flex-row justify-center"></View>
+                    <View className="bg-orange-900 rounded-tl-full rounded-tr-full mx-4 w-26 h-2 text-center flex flex-row justify-center"></View>
                   )}
                 </View>
               </View>

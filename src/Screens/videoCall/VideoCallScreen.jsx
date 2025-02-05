@@ -19,6 +19,17 @@ const VideoCallScreen = ({ route, navigation }) => {
   const [isCameraOn, setCameraOn] = useState(true);
   const [isSpeakerOn, setSpeakerOn] = useState(true);
   const { leave } = useWebSocket();
+  const [callDuration, setCallDuration] = useState(0);
+  const durationInterval = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      // Cleanup interval on unmount
+      if (durationInterval.current) clearInterval(durationInterval.current);
+    };
+  }, []);
+
+
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -38,6 +49,44 @@ const VideoCallScreen = ({ route, navigation }) => {
     // };
   }, []);
 
+  // const init = async () => {
+  //   try {
+  //     _engine.current = createAgoraRtcEngine();
+  //     _engine.current.registerEventHandler({
+  //       onJoinChannelSuccess: () => {
+  //         showMessage('Successfully joined the channel ' + config.channelName);
+  //         setJoined(true);
+  //         setConnectionStatus('Connected');
+  //       },
+  //       onUserJoined: (_connection, Uid) => {
+  //         showMessage('Remote user joined with uid' + Uid);
+  //         setPeerIds(prev => [...prev, Uid]);
+  //       },
+  //       onUserOffline: (_connection, Uid) => {
+  //         showMessage('Remote user left the channel. uid: ' + Uid);
+  //         setPeerIds(prev => prev.filter(id => id !== Uid));
+  //       },
+  //       onError: err => {
+  //         console.error('Agora Error:', err);
+  //         showMessage('Agora Error: ' + JSON.stringify(err));
+  //         setConnectionStatus('Error');
+  //       },
+  //     });
+
+  //     _engine.current.initialize({
+  //       appId: appId,
+  //       channelProfile: ChannelProfileType.ChannelProfileCommunication,
+  //     });
+
+  //     _engine.current.enableVideo();
+  //     _engine.current.startPreview();
+  //     startCall();
+  //   } catch (error) {
+  //     console.error('Error initializing Agora Engine:', error);
+  //     showMessage('Error initializing Agora Engine: ' + error);
+  //   }
+  // };
+
   const init = async () => {
     try {
       _engine.current = createAgoraRtcEngine();
@@ -46,6 +95,13 @@ const VideoCallScreen = ({ route, navigation }) => {
           showMessage('Successfully joined the channel ' + config.channelName);
           setJoined(true);
           setConnectionStatus('Connected');
+  
+          // Start call duration counter
+          setCallDuration(0);
+          if (durationInterval.current) clearInterval(durationInterval.current);
+          durationInterval.current = setInterval(() => {
+            setCallDuration(prev => prev + 1);
+          }, 1000);
         },
         onUserJoined: (_connection, Uid) => {
           showMessage('Remote user joined with uid' + Uid);
@@ -61,12 +117,12 @@ const VideoCallScreen = ({ route, navigation }) => {
           setConnectionStatus('Error');
         },
       });
-
+  
       _engine.current.initialize({
         appId: appId,
         channelProfile: ChannelProfileType.ChannelProfileCommunication,
       });
-
+  
       _engine.current.enableVideo();
       _engine.current.startPreview();
       startCall();
@@ -92,22 +148,40 @@ const VideoCallScreen = ({ route, navigation }) => {
     }
   };
 
+  // const endCall = async () => {
+  //   try {
+  //     if (_engine.current) {
+  //       await _engine.current.leaveChannel();
+  //       _engine.current.removeAllListeners();
+  //       _engine.current.release();
+  //          leave();
+  //     }
+  //   } catch (error) {
+  //     console.error('Error ending call:', error);
+  //     showMessage('Error ending call: ' + error);
+  //   }
+
+  //   setPeerIds([]);
+  //   setJoined(false);
+  //   setConnectionStatus('Not Connected');
+  // };
   const endCall = async () => {
     try {
       if (_engine.current) {
         await _engine.current.leaveChannel();
         _engine.current.removeAllListeners();
         _engine.current.release();
-           leave();
+        leave();
       }
     } catch (error) {
       console.error('Error ending call:', error);
       showMessage('Error ending call: ' + error);
     }
-
     setPeerIds([]);
     setJoined(false);
     setConnectionStatus('Not Connected');
+    // Stop call duration counter
+    if (durationInterval.current) clearInterval(durationInterval.current);
   };
 
   const toggleMic = () => {
@@ -145,6 +219,11 @@ const VideoCallScreen = ({ route, navigation }) => {
   const _renderVideos = () => (
     <View style={styles.fullView}>
       <View style={styles.remoteContainer}>
+      <View style={styles.counterContainer}>
+        <Text style={styles.callDuration}>
+          Duration: {Math.floor(callDuration / 60)}:{(callDuration % 60).toString().padStart(2, '0')}
+        </Text>
+      </View>
         {_renderRemoteVideos()}
       </View>
       {isCameraOn && (
@@ -159,19 +238,19 @@ const VideoCallScreen = ({ route, navigation }) => {
     <View style={styles.max}>
       {isJoined && _renderVideos()}
       <View style={styles.buttonHolder}>
-        <TouchableOpacity onPress={endCall}>
+        <TouchableOpacity  onPress={endCall} style={styles.button}>
           <SvgXml xml={SVG_hangout_red} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={toggleMic}>
+        <TouchableOpacity onPress={toggleMic} style={styles.button}>
           {isMicOn ? <SvgXml xml={SVG_mute_mic} /> : <SvgXml xml={SVG_unmute_mic} />}
         </TouchableOpacity>
-        <TouchableOpacity onPress={switchCamera}>
+        <TouchableOpacity onPress={switchCamera} style={styles.button}>
           <SvgXml xml={SVG_switch_camera} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={toggleCamera}>
+        <TouchableOpacity onPress={toggleCamera} style={styles.button}>
           {isCameraOn ? <SvgXml xml={SVG_stop_camera} /> : <SvgXml xml={SVG_switch_camera} />}
         </TouchableOpacity>
-        <TouchableOpacity onPress={toggleSpeaker}>
+        <TouchableOpacity onPress={toggleSpeaker} style={styles.button}>
           {isSpeakerOn ? <SvgXml xml={SVG_speaker} /> : <SvgXml xml={SVG_speakeroff} />}
         </TouchableOpacity>
       </View>
@@ -211,10 +290,31 @@ const styles = StyleSheet.create({
     height: height / 2,
     borderRadius: 10,
   },
+  counterContainer: {
+    width:200,
+    backgroundColor: '#997654',
+    borderRadius: 20,
+    margin: 10,
+    padding: 10,
+  },
+  callDuration: {
+    fontSize: 18,
+    color: 'white',
+  },
   buttonHolder: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 20,
+  },
+  button: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: 'slategray',
+    borderWidth: 2,
   },
   text: {
     color: 'black',

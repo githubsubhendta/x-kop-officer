@@ -152,8 +152,8 @@ const UserSummeryScreen = ({route, navigation}) => {
 
   return (
     <PaperProvider>
-      <View className="relative flex-1 h-full px-4  bg-white">
-        <View className="py-3 flex flex-wrap flex-row justify-between w-full">
+      <View className="relative flex-1 h-full  bg-white">
+        <View className="py-3 px-3 flex flex-wrap flex-row justify-between w-full">
           <Icon
             name="arrowleft"
             color="#000"
@@ -170,7 +170,7 @@ const UserSummeryScreen = ({route, navigation}) => {
           />
         </View>
 
-        <View className="text-center flex justify-center items-center">
+        <View className="text-center px-4 flex justify-center items-center">
           <Image
             source={userInfo?.avatar ? {uri: userInfo.avatar} : userImg}
             className="w-24 h-24 rounded-full"
@@ -184,7 +184,7 @@ const UserSummeryScreen = ({route, navigation}) => {
           </Text>
         </View>
 
-        <View className="flex flex-wrap flex-row  pb-2 justify-between w-full">
+        <View className="flex px-4 flex-wrap flex-row  pb-2 justify-between w-full">
           <Text className="text-black font-bold w-1/2">Summary</Text>
           <Text
             className="text-blue-600 font-medium text-right border-b border-blue-600"
@@ -192,7 +192,7 @@ const UserSummeryScreen = ({route, navigation}) => {
             Edit
           </Text>
         </View>
-        <View className="flex items-center">
+        <View className="flex px-4 items-center">
           <Text className="text-black">
             {summary
               ? summary
@@ -202,7 +202,7 @@ const UserSummeryScreen = ({route, navigation}) => {
 
         <Text className="border-b border-gray-500 h-2 w-full p-2"></Text>
 
-        <View className="flex flex-wrap flex-row py-4 justify-between w-full">
+        <View className="flex px-4 flex-wrap flex-row py-4 justify-between w-full">
           <Text className="text-black font-bold w-1/2">Media</Text>
           <Text
             className="text-blue-600 font-medium text-right border-b border-blue-600"
@@ -211,7 +211,7 @@ const UserSummeryScreen = ({route, navigation}) => {
           </Text>
         </View>
 
-        <View className="checklistWrappper text-left pb-4">
+        <View className="checklistWrappper px-4 text-left pb-4">
           <RadioButton.Group
             onValueChange={newValue => setDocumentType(newValue)}
             value={documentType}>
@@ -250,7 +250,7 @@ const UserSummeryScreen = ({route, navigation}) => {
 
         <Text className="border-b border-gray-500 h-2 w-full"></Text>
 
-        <View className="flex flex-wrap flex-row  py-4 justify-between w-full">
+        <View className="flex px-4 flex-wrap flex-row  py-4 justify-between w-full">
           <Text className="text-black font-bold w-1/2">Notes</Text>
           <Text
             className="text-blue-600 font-medium text-right border-b border-blue-600"
@@ -262,7 +262,7 @@ const UserSummeryScreen = ({route, navigation}) => {
           {note != '' ? note : `No Note Found`}
         </Text>
 
-        <View className="absolute bottom-0 w-full">
+        <View className="absolute bottom-0 w-full mx-auto">
           <TouchableHighlight className="mx-6">
             <View className="flex justify-center items-center bg-red-800 py-4 rounded-lg">
               <Text

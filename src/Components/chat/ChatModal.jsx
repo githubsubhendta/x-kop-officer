@@ -167,7 +167,7 @@ const ChatModal = React.memo(({chatId, isVisible, onClose}) => {
 
   const updateNewMessageStore = newMessage => {
     const updatedConversations = conversations.map(convo => {
-      if (convo.conversationId === chatId) {
+      if (convo && convo.conversationId === chatId) {
         return {
           ...convo,
           messages: newMessage,
@@ -184,22 +184,22 @@ const ChatModal = React.memo(({chatId, isVisible, onClose}) => {
 
       if (conversations.length === 0) {
         setConversations([
-          { conversationId: chatId, messages: getInitial.messages },
-          console.log('conversations upadeted',conversations)
+          { conversationId: chatId, messages: getInitial?.messages || [] },
         ]);
       } else {
         const currentConversation = conversations.find(
-          convo => convo.conversationId === chatId,
+          convo => convo?.conversationId === chatId
         );
         if (currentConversation) {
-          updateNewMessageStore(getInitial.messages);
+          updateNewMessageStore(getInitial?.messages || []);
         } else {
           setConversations([
             ...conversations,
-            { conversationId: chatId, messages: getInitial.messages },
+            { conversationId: chatId, messages: getInitial?.messages || [] },
           ]);
         }
       }
+      
     })();
   }, []);
 
