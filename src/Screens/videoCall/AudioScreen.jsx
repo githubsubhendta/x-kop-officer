@@ -37,8 +37,8 @@ const AudioScreen = ({route, navigation}) => {
   const [peerIds, setPeerIds] = useState([]);
   const [modelChat, setModelChat] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-
   const [callDuration, setCallDuration] = useState('00:00:00');
+ 
 
   const {engine, isJoined} = useAgoraEngine(
     config,
