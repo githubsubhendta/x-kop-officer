@@ -24,7 +24,7 @@ const RequestAbsence = ({navigation}) => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchData('/officer-available/absences', 'GET'); // Refetch data on refresh
+    fetchData('/officer-available/absences', 'GET'); 
     setTimeout(() => {
       setRefreshing(false);
     }, 2000);

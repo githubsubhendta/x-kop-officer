@@ -256,6 +256,7 @@ const VideoCallScreen = ({route, navigation}) => {
         </View>
         {_renderRemoteVideos()}
       </View>
+
       {isCameraOn && (
         <View style={styles.localContainer}>
           <RtcSurfaceView style={styles.local} canvas={{uid: 0}} />
@@ -268,11 +269,11 @@ const VideoCallScreen = ({route, navigation}) => {
       {isJoined && _renderVideos()}
       <View style={styles.buttonHolder}>
         <TouchableOpacity onPress={endCall} style={styles.button}>
-          <SvgXml xml={SVG_hangout_red}/>
+          <SvgXml xml={SVG_hangout_red} />
         </TouchableOpacity>
         <TouchableOpacity onPress={toggleMic} style={styles.button}>
           {isMicOn ? (
-             <SvgXml xml={SVG_unmute_mic} />
+            <SvgXml xml={SVG_unmute_mic} />
           ) : (
             <SvgXml xml={SVG_mute_mic} />
           )}
@@ -298,51 +299,63 @@ const VideoCallScreen = ({route, navigation}) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   max: {
     flex: 1,
   },
   fullView: {
     flex: 1,
+    backgroundColor: '#000', 
+    justifyContent: 'center',
+    alignItems: 'center',
     position: 'relative',
   },
   localContainer: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 100,
-    height: 150,
-    margin: 10,
-    borderRadius: 10,
+    backgroundColor:'#000',
+    bottom: 10,
+    right: 20,
+    width: 120, 
+    height: 180,
+    borderRadius: 12,
     overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#fff', 
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 5, 
   },
   local: {
     width: '100%',
     height: '100%',
+    borderRadius: 12,
   },
   remoteContainer: {
     flex: 1,
+    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
   remote: {
-    width: width - 20,
+    width: width - 10,
     height: height / 2,
     borderRadius: 10,
   },
   counterContainer: {
-    width: 180,
-    backgroundColor: '#997654',
+    position: 'absolute',
+    top: 10,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    paddingVertical: 5,
+    paddingHorizontal: 16,
     borderRadius: 20,
-    margin: 10,
-    padding: 8,
-    alignItems:"center",
   },
   callDuration: {
-    fontSize: 13,
-    color: 'white',
-    textAlign: 'center',
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   buttonHolder: {
     flexDirection: 'row',
