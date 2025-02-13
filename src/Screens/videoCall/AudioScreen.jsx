@@ -8,7 +8,9 @@ import {
   Alert,
   TextInput,
   Platform,
+  PermissionsAndroid
 } from 'react-native';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import {SvgXml} from 'react-native-svg';
 import RNFS from 'react-native-fs';
 // import { RtcSurfaceView } from 'react-native-agora';
@@ -56,14 +58,55 @@ const AudioScreen = ({route, navigation}) => {
 
 ///////////////////////////////////// Call Recording /////////////////////////////////////////
 
-  const getRecordingFilePath = () => {
-    const directoryPath =
-      Platform.OS === 'android'
-        ? `${RNFS.DownloadDirectoryPath}/MyRecordings`
-        : `${RNFS.DocumentDirectoryPath}/Recordings`;
 
-    return `${directoryPath}/call_recording_${Date.now()}.aac`;
-  };
+
+const requestPermissions = async () => {
+  if (Platform.OS === 'android') {
+    try {
+      const granted = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+      ]);
+      if (
+        granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED &&
+        granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED &&
+        granted['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.GRANTED
+      ) {
+        console.log('Permissions granted');
+      } else {
+        console.log('Permissions denied');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  } else if (Platform.OS === 'ios') {
+    const microphoneStatus = await request(PERMISSIONS.IOS.MICROPHONE);
+    if (microphoneStatus === RESULTS.GRANTED) {
+      console.log('Microphone permission granted');
+    } else {
+      console.log('Microphone permission denied');
+    }
+  }
+};
+
+useEffect(() => {
+  requestPermissions();
+}, []);
+
+const getRecordingFilePath = () => {
+  const directoryPath =
+    Platform.OS === 'android'
+      ? `${RNFS.DownloadDirectoryPath}/MyRecordings`
+      : `${RNFS.DocumentDirectoryPath}/Recordings`;
+
+  // Ensure the directory exists
+  RNFS.mkdir(directoryPath)
+    .then(() => console.log('Directory created or already exists'))
+    .catch(err => console.error('Error creating directory:', err));
+
+  return `${directoryPath}/call_recording_${Date.now()}.aac`;
+};
 
   const startRecording = async () => {
     if (engine.current) {
@@ -76,11 +119,11 @@ const AudioScreen = ({route, navigation}) => {
           sampleRate: 32000,
           quality: 1,
         });
-
         setIsRecording(true);
         Alert.alert('Recording Started', `File saved to: ${filePath}`);
       } catch (error) {
         console.error('Error starting recording:', error);
+        Alert.alert('Error', 'Failed to start recording. Please check permissions and try again.');
       }
     }
   };
@@ -287,107 +330,6 @@ const AudioScreen = ({route, navigation}) => {
   );
 };
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//   },
-//   connectionStatus: {
-//     textAlign: 'center',
-//     marginTop: 20,
-//     color: 'black',
-//   },
-//   mainContent: {
-//     flex: 1,
-//     justifyContent: 'space-between',
-//   },
-//   endCallButton: {
-//     margin: 20,
-//     alignItems: 'flex-end',
-//   },
-//   infoContainer: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-//   profileImage: {
-//     width: 150,
-//     height: 150,
-//     borderRadius: 75,
-//   },
-//   textContainer: {
-//     alignItems: 'center',
-//     marginVertical: 10,
-//   },
-//   name: {
-//     fontSize: 24,
-//     fontWeight: '500',
-//   },
-//   title: {
-//     fontSize: 20,
-
-//   },
-//   status: {
-//     fontSize: 16,
-//     color: 'gray',
-//   },
-//   counterContainer: {
-//     backgroundColor: '#997654',
-//     borderRadius: 15,
-//     marginTop: 10,
-//     padding: 10,
-//   },
-//   callDuration: {
-//     fontSize: 18,
-//     color: 'white',
-//   },
-//   buttonContainer: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-around',
-//     paddingHorizontal: 20,
-//     paddingBottom: 20,
-//   },
-//   button: {
-//     width: 62,
-//     height: 62,
-//     borderRadius: 31,
-//     backgroundColor: '#fff',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     borderColor: 'slategray',
-//     borderWidth: 2,
-//   },
-//   messageInputContainer: {
-//     paddingHorizontal: 10,
-//     paddingBottom: 10,
-//     flexDirection: 'row',
-//     justifyContent: 'center',
-//   },
-//   input: {
-//     // flex: 1,
-//     fontSize: 16,
-//     color: '#000',
-//     width: 'auto',
-//   },
-//   iconsContainer: {
-//     flexDirection: 'row',
-//     // width:"100%",
-//   },
-//   iconButton: {
-//     padding: 5,
-//     marginLeft: 5,
-//   },
-//   InputContainer: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     borderColor: '#ccc',
-//     borderWidth: 1,
-//     borderRadius: 12,
-//     paddingHorizontal: 10,
-//     paddingVertical: 5,
-//     margin: 10,
-//   },
-// });
 const styles = StyleSheet.create({
   container: {
     flex: 1,
