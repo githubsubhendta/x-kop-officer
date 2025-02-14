@@ -270,13 +270,13 @@ const VideoCallScreen = ({route, navigation}) => {
   const toggleCamera = () => {
     if (isCameraOn) {
       // Turn off the camera and switch to audio-only call
-      _engine.current?.enableLocalVideo(false);
-      _engine.current?.muteLocalVideoStream(true);
+      _engine.current?.enableLocalVideo(true);
+      _engine.current?.muteLocalVideoStream(false);
       navigation.goBack();
     } else {
       // Turn on the camera and switch back to video call
-      _engine.current?.enableLocalVideo(true);
-      _engine.current?.muteLocalVideoStream(false);
+      _engine.current?.enableLocalVideo(false);
+      _engine.current?.muteLocalVideoStream(true);
     }
     setCameraOn(prev => !prev);
   };
