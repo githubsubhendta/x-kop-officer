@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Platform,
   ScrollView,
@@ -26,7 +26,7 @@ import {
   SVG_unmute_mic,
 } from './../../Utils/SVGImage.js';
 import {useWebSocket} from '../../shared/WebSocketProvider.jsx';
-
+import {useFocusEffect} from '@react-navigation/native';
 const {width, height} = Dimensions.get('window');
 const appId = '1be639d040da4a42be10d134055a2abd';
 
@@ -41,9 +41,6 @@ const VideoCallScreen = ({route, navigation}) => {
   const [isSpeakerOn, setSpeakerOn] = useState(true);
   const {webSocket, leave} = useWebSocket();
   const [callDuration, setCallDuration] = useState('00:00:00');
-
-  // const durationInterval = useRef(null);
-
   useEffect(() => {
     const handleCallDurationUpdate = data => {
       setCallDuration(data.callDuration);
@@ -55,28 +52,75 @@ const VideoCallScreen = ({route, navigation}) => {
     };
   }, [webSocket, endCall]);
 
-  useEffect(() => {
-    if (Platform.OS === 'android') {
-      requestCameraAndAudioPermission().then(() => {
-        console.log('Permissions requested!');
-      });
-    }
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     if (Platform.OS === 'android') {
+  //       requestCameraAndAudioPermission().then(() => {
+  //         console.log('Permissions requested!');
+  //       });
+  //     }
+  //     if (
+  //       !config ||
+  //       !config.channelName ||
+  //       !config.token ||
+  //       typeof config.uid !== 'number'
+  //     ) {
+  //       console.error('Invalid config parameters');
+  //       navigation.goBack();
+  //       return;
+  //     }
+  //     init();
+  //     return () => {
+  //       // Cleanup function to be called when the screen is unfocused
+  //       if (_engine.current) {
+  //         _engine.current.leaveChannel();
+  //         _engine.current.removeAllListeners();
+  //         _engine.current.release();
+  //         _engine.current = null;
+  //       }
+  //     };
+  //   }, [config, navigation]),
+  // );
 
-    if (
-      !config ||
-      !config.channelName ||
-      !config.token ||
-      typeof config.uid !== 'number'
-    ) {
-      console.error('Invalid config parameters');
-      navigation.goBack();
-      return;
-    }
-    init();
-    // return () => {
-    //   endCall();
-    // };
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS === 'android') {
+        requestCameraAndAudioPermission().then(() => {
+          console.log('Permissions requested!');
+        });
+      }
+  
+      if (
+        !config ||
+        !config.channelName ||
+        !config.token ||
+        typeof config.uid !== 'number'
+      ) {
+        console.error('Invalid config parameters');
+        navigation.goBack();
+        return;
+      }
+  
+      // Initialize the Agora Engine only if it's not already initialized
+      if (!_engine.current) {
+        init();
+      } else {
+        // Re-enable video if coming back from camera-off state
+        _engine.current.enableLocalVideo(true);
+        _engine.current.muteLocalVideoStream(false);
+        setCameraOn(true);
+      }
+  
+      return () => {
+        // Cleanup when leaving the screen
+        if (_engine.current) {
+          _engine.current.enableLocalVideo(false);
+          _engine.current.muteLocalVideoStream(true);
+        }
+      };
+    }, [config, navigation])
+  );
+  
 
   const init = async () => {
     try {
@@ -224,7 +268,16 @@ const VideoCallScreen = ({route, navigation}) => {
   };
 
   const toggleCamera = () => {
-    _engine.current?.enableLocalVideo(!isCameraOn);
+    if (isCameraOn) {
+      // Turn off the camera and switch to audio-only call
+      _engine.current?.enableLocalVideo(false);
+      _engine.current?.muteLocalVideoStream(true);
+      navigation.goBack();
+    } else {
+      // Turn on the camera and switch back to video call
+      _engine.current?.enableLocalVideo(true);
+      _engine.current?.muteLocalVideoStream(false);
+    }
     setCameraOn(prev => !prev);
   };
 
