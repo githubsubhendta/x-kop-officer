@@ -499,46 +499,21 @@ export const SVG_unmute_mic = `<svg xmlns="http://www.w3.org/2000/svg" height="2
 export const SVG_mute_mic = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000"><path d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm0-240Zm-40 520v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Zm40-360q17 0 28.5-11.5T520-520v-240q0-17-11.5-28.5T480-800q-17 0-28.5 11.5T440-760v240q0 17 11.5 28.5T480-480Z"/></svg>`;
 
 export const SVG_stop_camera = `<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 38 38" fill="none">
-<g filter="url(#filter0_d_2_64)">
-<path d="M34 15C34 23.2843 27.2843 30 19 30C10.7157 30 4 23.2843 4 15C4 6.71573 10.7157 0 19 0C27.2843 0 34 6.71573 34 15Z" fill="white"/>
-</g>
-<path d="M22 11V19H12V11H22ZM23 9H11C10.45 9 10 9.45 10 10V20C10 20.55 10.45 21 11 21H23C23.55 21 24 20.55 24 20V16.5L28 20.5V9.5L24 13.5V10C24 9.45 23.55 9 23 9Z" fill="black"/>
-<defs>
-<filter id="filter0_d_2_64" x="0" y="0" width="38" height="38" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dy="4"/>
-<feGaussianBlur stdDeviation="2"/>
-<feComposite in2="hardAlpha" operator="out"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
-<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2_64"/>
-<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2_64" result="shape"/>
-</filter>
-</defs>
+  <g clip-path="url(#clip0_2_86)">
+    <path d="M16.56 11L14.56 9L10.41 4.86L9 6.27L11.73 9H11C10.45 9 10 9.45 10 10V20C10 20.55 10.45 21 11 21H23C23.21 21 23.39 20.92 23.55 20.82L26.73 24L28.14 22.59L19.28 13.73L16.56 11ZM12 19V11H13.73L21.73 19H12ZM22 11V13.61L28 19.61V9.5L24 13.5V10C24 9.45 23.55 9 23 9H17.39L19.39 11H22Z" fill="black"/>
+  </g>
+  <defs>
+    <clipPath id="clip0_2_86">
+      <rect width="24" height="24" fill="white" transform="translate(7 3)"/>
+    </clipPath>
+  </defs>
 </svg>`;
 
-export const SVG_switch_camera = `<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 38 38" fill="none">
-<g filter="url(#filter0_d_2_86)">
-<path d="M34 15C34 23.2843 27.2843 30 19 30C10.7157 30 4 23.2843 4 15C4 6.71573 10.7157 0 19 0C27.2843 0 34 6.71573 34 15Z" fill="white"/>
-</g>
-<g clip-path="url(#clip0_2_86)">
-<path d="M16.56 11L14.56 9L10.41 4.86L9 6.27L11.73 9H11C10.45 9 10 9.45 10 10V20C10 20.55 10.45 21 11 21H23C23.21 21 23.39 20.92 23.55 20.82L26.73 24L28.14 22.59L19.28 13.73L16.56 11ZM12 19V11H13.73L21.73 19H12ZM22 11V13.61L28 19.61V9.5L24 13.5V10C24 9.45 23.55 9 23 9H17.39L19.39 11H22Z" fill="black"/>
-</g>
-<defs>
-<filter id="filter0_d_2_86" x="0" y="0" width="38" height="38" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dy="4"/>
-<feGaussianBlur stdDeviation="2"/>
-<feComposite in2="hardAlpha" operator="out"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
-<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2_86"/>
-<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2_86" result="shape"/>
-</filter>
-<clipPath id="clip0_2_86">
-<rect width="24" height="24" fill="white" transform="translate(7 3)"/>
-</clipPath>
-</defs>
+export const SVG_switch_camera = `<svg width="28px" height="28px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <g>
+        <path fill="none" d="M0 0h24v24H0z"/>
+        <path d="M9 3h6l2 2h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4l2-2zm5.684 15.368l-.895-1.79A4 4 0 0 1 8 13h2.001L7.839 8.677a6 6 0 0 0 6.845 9.69zM9.316 7.632l.895 1.79A4 4 0 0 1 16 13h-2.001l2.161 4.323a6 6 0 0 0-6.845-9.69z"/>
+    </g>
 </svg>`;
 
 export const SVG_speaker = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000"><path d="M560-131v-82q90-26 145-100t55-168q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320Z"/></svg>`;

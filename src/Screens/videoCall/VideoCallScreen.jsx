@@ -338,7 +338,7 @@ const VideoCallScreen = ({route, navigation}) => {
           {isCameraOn ? (
             <SvgXml xml={SVG_stop_camera} />
           ) : (
-            <SvgXml xml={SVG_switch_camera} />
+            <SvgXml xml={SVG_stop_camera} />
           )}
         </TouchableOpacity>
         <TouchableOpacity onPress={toggleSpeaker} style={styles.button}>
@@ -369,10 +369,10 @@ const styles = StyleSheet.create({
     bottom: 10,
     right: 20,
     width: 120, 
-    height: 180,
-    borderRadius: 12,
+    height: 170,
+    borderRadius: 14,
     overflow: 'hidden',
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: '#fff', 
     shadowColor: '#000',
     shadowOpacity: 0.3,
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
   },
   remote: {
     width: width - 10,
-    height: height / 2,
+    height: height / 2.6,
     borderRadius: 10,
   },
   counterContainer: {
