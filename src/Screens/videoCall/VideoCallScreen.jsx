@@ -89,7 +89,7 @@ const VideoCallScreen = ({route, navigation}) => {
           console.log('Permissions requested!');
         });
       }
-  
+
       if (
         !config ||
         !config.channelName ||
@@ -100,7 +100,7 @@ const VideoCallScreen = ({route, navigation}) => {
         navigation.goBack();
         return;
       }
-  
+
       // Initialize the Agora Engine only if it's not already initialized
       if (!_engine.current) {
         init();
@@ -110,7 +110,7 @@ const VideoCallScreen = ({route, navigation}) => {
         _engine.current.muteLocalVideoStream(false);
         setCameraOn(true);
       }
-  
+
       return () => {
         // Cleanup when leaving the screen
         if (_engine.current) {
@@ -118,9 +118,8 @@ const VideoCallScreen = ({route, navigation}) => {
           _engine.current.muteLocalVideoStream(true);
         }
       };
-    }, [config, navigation])
+    }, [config, navigation]),
   );
-  
 
   const init = async () => {
     try {
@@ -321,25 +320,24 @@ const VideoCallScreen = ({route, navigation}) => {
     <View style={styles.max}>
       {isJoined && _renderVideos()}
       <View style={styles.buttonHolder}>
-        <TouchableOpacity onPress={endCall} style={styles.button}>
-          <SvgXml xml={SVG_hangout_red} />
-        </TouchableOpacity>
         <TouchableOpacity onPress={toggleMic} style={styles.button}>
           {isMicOn ? (
-            <SvgXml xml={SVG_unmute_mic} />
-          ) : (
             <SvgXml xml={SVG_mute_mic} />
+          ) : (
+            <SvgXml xml={SVG_unmute_mic} />
           )}
         </TouchableOpacity>
         <TouchableOpacity onPress={switchCamera} style={styles.button}>
           <SvgXml xml={SVG_switch_camera} />
         </TouchableOpacity>
+        <TouchableOpacity onPress={endCall} style={styles.button}>
+          <SvgXml xml={SVG_hangout_red} />
+        </TouchableOpacity>
         <TouchableOpacity onPress={toggleCamera} style={styles.button}>
-          {isCameraOn ? (
-            <SvgXml xml={SVG_stop_camera} />
-          ) : (
-            <SvgXml xml={SVG_stop_camera} />
-          )}
+          <SvgXml
+            xml={isCameraOn ? SVG_stop_camera : SVG_stop_camera}
+            className="mt-2"
+          />
         </TouchableOpacity>
         <TouchableOpacity onPress={toggleSpeaker} style={styles.button}>
           {isSpeakerOn ? (
@@ -349,36 +347,36 @@ const VideoCallScreen = ({route, navigation}) => {
           )}
         </TouchableOpacity>
       </View>
+      
     </View>
   );
 };
 const styles = StyleSheet.create({
   max: {
     flex: 1,
+    backgroundColor: '#000',
   },
   fullView: {
     flex: 1,
-    backgroundColor: '#000', 
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
   },
   localContainer: {
     position: 'absolute',
-    backgroundColor:'#000',
+    backgroundColor: '#000',
     bottom: 10,
     right: 20,
-    width: 120, 
+    width: 120,
     height: 170,
     borderRadius: 14,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#fff', 
+    borderColor: '#fff',
     shadowColor: '#000',
     shadowOpacity: 0.3,
     shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 5, 
+    shadowOffset: {width: 0, height: 2},
+    elevation: 5,
   },
   local: {
     width: '100%',
