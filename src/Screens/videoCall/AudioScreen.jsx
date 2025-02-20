@@ -432,7 +432,7 @@
 
 // export default AudioScreen;
 
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -443,9 +443,10 @@ import {
   TextInput,
   Platform,
   PermissionsAndroid,
+  Dimensions,
 } from 'react-native';
-import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
-import {SvgXml} from 'react-native-svg';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { SvgXml } from 'react-native-svg';
 import RNFS from 'react-native-fs';
 import useAgoraEngine from '../../hooks/useAgoraEngine';
 import {
@@ -456,13 +457,15 @@ import {
   SVG_speakeroff,
   SVG_unmute_mic,
 } from './../../Utils/SVGImage.js';
-import {useWebSocket} from '../../shared/WebSocketProvider.jsx';
+import { useWebSocket } from '../../shared/WebSocketProvider.jsx';
 import ChatModal from '../../Components/chat/ChatModal.jsx';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const AudioScreen = ({route, navigation}) => {
-  const {config, mobile, chatId, userInfo} = route.params || {};
-  const {webSocket, leave} = useWebSocket();
+const { width, height } = Dimensions.get('window');
+
+const AudioScreen = ({ route, navigation }) => {
+  const { config, mobile, chatId, userInfo } = route.params || {};
+  const { webSocket, leave } = useWebSocket();
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeakerEnabled, setIsSpeakerEnabled] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState('Not Connected');
@@ -471,7 +474,7 @@ const AudioScreen = ({route, navigation}) => {
   const [isRecording, setIsRecording] = useState(false);
   const [callDuration, setCallDuration] = useState('00:00:00');
 
-  const {engine, isJoined} = useAgoraEngine(
+  const { engine, isJoined } = useAgoraEngine(
     config,
     useCallback(() => setConnectionStatus('Connected'), []),
     useCallback(Uid => {
@@ -490,6 +493,7 @@ const AudioScreen = ({route, navigation}) => {
           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
           PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
           PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          PermissionsAndroid.PERMISSIONS.CAMERA, // Add camera permission
         ]);
         if (
           granted['android.permission.WRITE_EXTERNAL_STORAGE'] ===
@@ -497,6 +501,8 @@ const AudioScreen = ({route, navigation}) => {
           granted['android.permission.READ_EXTERNAL_STORAGE'] ===
             PermissionsAndroid.RESULTS.GRANTED &&
           granted['android.permission.RECORD_AUDIO'] ===
+            PermissionsAndroid.RESULTS.GRANTED &&
+          granted['android.permission.CAMERA'] === // Check camera permission
             PermissionsAndroid.RESULTS.GRANTED
         ) {
           console.log('Permissions granted');
@@ -508,10 +514,11 @@ const AudioScreen = ({route, navigation}) => {
       }
     } else if (Platform.OS === 'ios') {
       const microphoneStatus = await request(PERMISSIONS.IOS.MICROPHONE);
-      if (microphoneStatus === RESULTS.GRANTED) {
-        console.log('Microphone permission granted');
+      const cameraStatus = await request(PERMISSIONS.IOS.CAMERA); // Add camera permission
+      if (microphoneStatus === RESULTS.GRANTED && cameraStatus === RESULTS.GRANTED) {
+        console.log('Microphone and camera permissions granted');
       } else {
-        console.log('Microphone permission denied');
+        console.log('Microphone or camera permission denied');
       }
     }
   }, []);
@@ -533,28 +540,55 @@ const AudioScreen = ({route, navigation}) => {
     return `${directoryPath}/call_recording_${Date.now()}.aac`;
   }, []);
 
-  const startRecording = useCallback(async () => {
-    if (engine.current) {
-      try {
-        const filePath = getRecordingFilePath();
-        await RNFS.mkdir(filePath.substring(0, filePath.lastIndexOf('/')));
-        console.log('Recording filePath ====>', filePath);
-        await engine.current.startAudioRecording({
-          filePath,
-          sampleRate: 32000,
-          quality: 1,
-        });
-        setIsRecording(true);
-        Alert.alert('Recording Started', `File saved to: ${filePath}`);
-      } catch (error) {
-        console.error('Error starting recording:', error);
-        Alert.alert(
-          'Error',
-          'Failed to start recording. Please check permissions and try again.',
-        );
-      }
+  const confirmAndStartRecording = () => {
+    Alert.alert(
+      'Start Recording',
+      'Do you want to start recording?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: startRecording,
+        },
+      ],
+    );
+  };
+
+  const startRecording = async () => {
+    if (!engine.current) {
+      console.error('Engine is not initialized');
+      Alert.alert('Error', 'Recording engine is not initialized.');
+      return;
     }
-  }, [engine, getRecordingFilePath]);
+
+    try {
+      const filePath = getRecordingFilePath();
+      const directoryPath = filePath.substring(0, filePath.lastIndexOf('/'));
+
+      // Ensure the directory exists
+      await RNFS.mkdir(directoryPath, { recursive: true });
+
+      console.log('Recording filePath ====>', filePath);
+
+      // Start the recording
+      await engine.current.startAudioRecording({
+        filePath,
+        sampleRate: 32000,
+        quality: 1,
+      });
+
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      Alert.alert(
+        'Error',
+        'Failed to start recording. Please check permissions and try again.',
+      );
+    }
+  };
 
   const stopRecording = useCallback(async () => {
     if (engine.current) {
@@ -591,7 +625,7 @@ const AudioScreen = ({route, navigation}) => {
 
   const switchToVideoCall = useCallback(async () => {
     if (engine.current) {
-      webSocket.emit('videocall', {calleeId: mobile});
+      webSocket.emit('videocall', { calleeId: mobile });
     }
   }, [engine, webSocket, mobile]);
 
@@ -605,7 +639,7 @@ const AudioScreen = ({route, navigation}) => {
       {
         text: 'OK',
         onPress: async () => {
-          webSocket.emit('VideoCallanswerCall', {callerId: mobile});
+          webSocket.emit('VideoCallanswerCall', { callerId: mobile });
           await engine.current?.leaveChannel();
           setTimeout(() => {
             navigation.navigate('VideoCallScreen', {
@@ -681,7 +715,7 @@ const AudioScreen = ({route, navigation}) => {
             <Image
               source={
                 userInfo?.avatar
-                  ? {uri: userInfo?.avatar}
+                  ? { uri: userInfo?.avatar }
                   : require('./../../images/book2.jpg')
               }
               style={styles.profileImage}
@@ -717,7 +751,7 @@ const AudioScreen = ({route, navigation}) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={isRecording ? stopRecording : startRecording}>
+              onPress={isRecording ? stopRecording : confirmAndStartRecording}>
               <Icon
                 name={isRecording ? 'stop' : 'fiber-manual-record'}
                 size={24}
@@ -761,13 +795,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     color: 'black',
+    fontSize: width > 400 ? 18 : 16,
   },
   mainContent: {
     flex: 1,
     justifyContent: 'space-between',
   },
   endCallButton: {
-    margin: 20,
+    margin: Platform.OS === 'ios' ? 40 : 20,
     alignItems: 'flex-end',
   },
   infoContainer: {
@@ -776,25 +811,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: width * 0.4,
+    height: width * 0.4,
+    borderRadius: (width * 0.4) / 2,
   },
   textContainer: {
     alignItems: 'center',
     marginVertical: 10,
   },
   name: {
-    fontSize: 24,
+    fontSize: width > 400 ? 24 : 20,
     fontWeight: '500',
     color: 'gray',
   },
   title: {
-    fontSize: 20,
+    fontSize: width > 400 ? 20 : 18,
     color: 'gray',
   },
   status: {
-    fontSize: 16,
+    fontSize: width > 400 ? 16 : 14,
     color: 'gray',
   },
   counterContainer: {
@@ -804,19 +839,19 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   callDuration: {
-    fontSize: 18,
+    fontSize: width > 400 ? 18 : 16,
     color: 'white',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
   },
   button: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
+    width: width * 0.15,
+    height: width * 0.15,
+    borderRadius: (width * 0.15) / 2,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
@@ -825,12 +860,12 @@ const styles = StyleSheet.create({
   },
   messageInputContainer: {
     paddingHorizontal: 10,
-    paddingBottom: 10,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 10,
     flexDirection: 'row',
     justifyContent: 'center',
   },
   input: {
-    fontSize: 16,
+    fontSize: width > 400 ? 16 : 14,
     color: '#000',
     width: 'auto',
   },

@@ -109,7 +109,7 @@ const LoginScreen = ({ navigation }) => {
           {otp && (
             <View className="mt-4">
               <Text className="text-green-600 text-[16px] font-medium">
-                Your OTP is: {otp}
+                Your OTP is sent on your registered mobile number
               </Text>
             </View>
           )}
