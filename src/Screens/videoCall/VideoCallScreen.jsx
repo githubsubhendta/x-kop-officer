@@ -692,8 +692,6 @@ const ControlButton = ({ onPress, children }) => (
     {children}
   </TouchableOpacity>
 );
-
-// Styles
 const styles = StyleSheet.create({
   max: {
     flex: 1,
@@ -729,6 +727,7 @@ const styles = StyleSheet.create({
   remoteContainer: {
     flex: 1,
     width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
