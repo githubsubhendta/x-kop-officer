@@ -437,7 +437,7 @@
 // });
 
 // export default VideoCallScreen;
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Platform,
   ScrollView,
@@ -446,6 +446,7 @@ import {
   View,
   StyleSheet,
   Dimensions,
+  AppState,
 } from 'react-native';
 import {
   ChannelProfileType,
@@ -454,7 +455,7 @@ import {
   createAgoraRtcEngine,
 } from 'react-native-agora';
 import requestCameraAndAudioPermission from '../../Components/permissions.js';
-import {SvgXml} from 'react-native-svg';
+import { SvgXml } from 'react-native-svg';
 import {
   SVG_hangout_red,
   SVG_mute_mic,
@@ -464,13 +465,14 @@ import {
   SVG_switch_camera,
   SVG_unmute_mic,
 } from './../../Utils/SVGImage.js';
-import {useWebSocket} from '../../shared/WebSocketProvider.jsx';
-import {useFocusEffect} from '@react-navigation/native';
-const {width, height} = Dimensions.get('window');
+import { useWebSocket } from '../../shared/WebSocketProvider.jsx';
+import { useFocusEffect } from '@react-navigation/native';
+
+const { width, height } = Dimensions.get('window');
 const appId = '1be639d040da4a42be10d134055a2abd';
 
-const VideoCallScreen = ({route, navigation}) => {
-  const {config, mobile, chatId, userInfo} = route.params || {};
+const VideoCallScreen = ({ route, navigation }) => {
+  const { config, mobile, chatId, userInfo } = route.params || {};
   const _engine = useRef(null);
   const [isJoined, setJoined] = useState(false);
   const [peerIds, setPeerIds] = useState([]);
@@ -478,9 +480,8 @@ const VideoCallScreen = ({route, navigation}) => {
   const [isMicOn, setMicOn] = useState(true);
   const [isCameraOn, setCameraOn] = useState(true);
   const [isSpeakerOn, setSpeakerOn] = useState(true);
-  const {webSocket, leave} = useWebSocket();
+  const { webSocket, leave } = useWebSocket();
   const [callDuration, setCallDuration] = useState('00:00:00');
-  // const [remoteVideoMuted, setRemoteVideoMuted] = useState(false);
 
   useEffect(() => {
     const handleCallDurationUpdate = data => {
@@ -491,7 +492,24 @@ const VideoCallScreen = ({route, navigation}) => {
     return () => {
       webSocket.off('updateCallDuration', handleCallDurationUpdate);
     };
-  }, [webSocket, endCall]);
+  }, [webSocket]);
+
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState) => {
+      if (nextAppState === 'active' && _engine.current) {
+        console.log('App resumed, restoring audio...');
+        _engine.current.enableAudio();
+        _engine.current.setEnableSpeakerphone(isSpeakerOn);
+        _engine.current.muteLocalAudioStream(!isMicOn);
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+      subscription.remove();
+    };
+  }, [isSpeakerOn, isMicOn]);
 
   useFocusEffect(
     useCallback(() => {
@@ -510,7 +528,19 @@ const VideoCallScreen = ({route, navigation}) => {
         navigation.goBack();
         return;
       }
-      init();
+
+      const initializeEngine = async () => {
+        if (!_engine.current) {
+          await init();
+        } else {
+          _engine.current.enableAudio();
+          _engine.current.setEnableSpeakerphone(isSpeakerOn);
+          _engine.current.muteLocalAudioStream(!isMicOn);
+        }
+      };
+
+      initializeEngine();
+
       return () => {
         if (_engine.current) {
           _engine.current.leaveChannel();
@@ -519,7 +549,7 @@ const VideoCallScreen = ({route, navigation}) => {
           _engine.current = null;
         }
       };
-    }, [config, navigation]),
+    }, [config, navigation, isMicOn, isSpeakerOn]),
   );
 
   const init = async () => {
@@ -542,8 +572,13 @@ const VideoCallScreen = ({route, navigation}) => {
         onUserMuteVideo: (_connection, Uid, muted) => {
           if (muted) {
             showMessage('Remote user turned off the camera');
-            // Navigate back to the previous screen if the remote user turns off the camera
             navigation.goBack();
+          }
+        },
+        onAudioRouteChanged: (routing) => {
+          console.log('Audio route changed:', routing);
+          if (isSpeakerOn) {
+            _engine.current.setEnableSpeakerphone(true);
           }
         },
         onError: err => {
@@ -573,7 +608,7 @@ const VideoCallScreen = ({route, navigation}) => {
         config.token,
         config.channelName,
         config.uid,
-        {clientRoleType: ClientRoleType.ClientRoleBroadcaster},
+        { clientRoleType: ClientRoleType.ClientRoleBroadcaster },
       );
       setConnectionStatus('Connecting...');
     } catch (error) {
@@ -603,7 +638,10 @@ const VideoCallScreen = ({route, navigation}) => {
 
   const toggleMic = () => {
     _engine.current?.muteLocalAudioStream(!isMicOn);
-    setMicOn(prev => !prev);
+    setMicOn(prev => {
+      console.log('Mic toggled to:', !prev);
+      return !prev;
+    });
   };
 
   const switchCamera = () => {
@@ -624,7 +662,10 @@ const VideoCallScreen = ({route, navigation}) => {
 
   const toggleSpeaker = () => {
     _engine.current?.setEnableSpeakerphone(!isSpeakerOn);
-    setSpeakerOn(prev => !prev);
+    setSpeakerOn(prev => {
+      console.log('Speaker toggled to:', !prev);
+      return !prev;
+    });
   };
 
   const showMessage = message => {
@@ -635,7 +676,7 @@ const VideoCallScreen = ({route, navigation}) => {
     if (peerIds.length > 0) {
       const id = peerIds[0];
       return (
-        <RtcSurfaceView style={styles.remote} canvas={{uid: id}} key={id} />
+        <RtcSurfaceView style={styles.remote} canvas={{ uid: id }} key={id} />
       );
     } else {
       return <Text style={styles.text}>No remote video</Text>;
@@ -653,7 +694,7 @@ const VideoCallScreen = ({route, navigation}) => {
 
       {isCameraOn && (
         <View style={styles.localContainer}>
-          <RtcSurfaceView style={styles.local} canvas={{uid: 0}} />
+          <RtcSurfaceView style={styles.local} canvas={{ uid: 0 }} />
         </View>
       )}
     </View>
@@ -718,7 +759,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.3,
     shadowRadius: 5,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     elevation: 5,
   },
   local: {
@@ -770,7 +811,7 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOpacity: 0.3,
         shadowRadius: 5,
-        shadowOffset: {width: 0, height: 2},
+        shadowOffset: { width: 0, height: 2 },
       },
       android: {
         elevation: 5,

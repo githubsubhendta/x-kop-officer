@@ -432,7 +432,7 @@
 
 // export default AudioScreen;
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -445,8 +445,8 @@ import {
   PermissionsAndroid,
   Dimensions,
 } from 'react-native';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import { SvgXml } from 'react-native-svg';
+import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import {SvgXml} from 'react-native-svg';
 import RNFS from 'react-native-fs';
 import useAgoraEngine from '../../hooks/useAgoraEngine';
 import {
@@ -457,15 +457,15 @@ import {
   SVG_speakeroff,
   SVG_unmute_mic,
 } from './../../Utils/SVGImage.js';
-import { useWebSocket } from '../../shared/WebSocketProvider.jsx';
+import {useWebSocket} from '../../shared/WebSocketProvider.jsx';
 import ChatModal from '../../Components/chat/ChatModal.jsx';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
-const AudioScreen = ({ route, navigation }) => {
-  const { config, mobile, chatId, userInfo } = route.params || {};
-  const { webSocket, leave } = useWebSocket();
+const AudioScreen = ({route, navigation}) => {
+  const {config, mobile, chatId, userInfo} = route.params || {};
+  const {webSocket, leave} = useWebSocket();
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeakerEnabled, setIsSpeakerEnabled] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState('Not Connected');
@@ -474,7 +474,7 @@ const AudioScreen = ({ route, navigation }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [callDuration, setCallDuration] = useState('00:00:00');
 
-  const { engine, isJoined } = useAgoraEngine(
+  const {engine, isJoined} = useAgoraEngine(
     config,
     useCallback(() => setConnectionStatus('Connected'), []),
     useCallback(Uid => {
@@ -515,13 +515,29 @@ const AudioScreen = ({ route, navigation }) => {
     } else if (Platform.OS === 'ios') {
       const microphoneStatus = await request(PERMISSIONS.IOS.MICROPHONE);
       const cameraStatus = await request(PERMISSIONS.IOS.CAMERA); // Add camera permission
-      if (microphoneStatus === RESULTS.GRANTED && cameraStatus === RESULTS.GRANTED) {
+      if (
+        microphoneStatus === RESULTS.GRANTED &&
+        cameraStatus === RESULTS.GRANTED
+      ) {
         console.log('Microphone and camera permissions granted');
       } else {
         console.log('Microphone or camera permission denied');
       }
     }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      const initializeEngine = async () => {
+        if (engine.current) {
+          await engine.current.enableAudio();
+          await engine.current.setEnableSpeakerphone(isSpeakerEnabled);
+          await engine.current.muteLocalAudioStream(isMuted);
+        }
+      };
+      initializeEngine();
+    }, [engine, isSpeakerEnabled, isMuted]),
+  );
 
   useEffect(() => {
     requestPermissions();
@@ -541,20 +557,16 @@ const AudioScreen = ({ route, navigation }) => {
   }, []);
 
   const confirmAndStartRecording = () => {
-    Alert.alert(
-      'Start Recording',
-      'Do you want to start recording?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'OK',
-          onPress: startRecording,
-        },
-      ],
-    );
+    Alert.alert('Start Recording', 'Do you want to start recording?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: startRecording,
+      },
+    ]);
   };
 
   const startRecording = async () => {
@@ -569,7 +581,7 @@ const AudioScreen = ({ route, navigation }) => {
       const directoryPath = filePath.substring(0, filePath.lastIndexOf('/'));
 
       // Ensure the directory exists
-      await RNFS.mkdir(directoryPath, { recursive: true });
+      await RNFS.mkdir(directoryPath, {recursive: true});
 
       console.log('Recording filePath ====>', filePath);
 
@@ -625,7 +637,7 @@ const AudioScreen = ({ route, navigation }) => {
 
   const switchToVideoCall = useCallback(async () => {
     if (engine.current) {
-      webSocket.emit('videocall', { calleeId: mobile });
+      webSocket.emit('videocall', {calleeId: mobile});
     }
   }, [engine, webSocket, mobile]);
 
@@ -639,7 +651,7 @@ const AudioScreen = ({ route, navigation }) => {
       {
         text: 'OK',
         onPress: async () => {
-          webSocket.emit('VideoCallanswerCall', { callerId: mobile });
+          webSocket.emit('VideoCallanswerCall', {callerId: mobile});
           await engine.current?.leaveChannel();
           setTimeout(() => {
             navigation.navigate('VideoCallScreen', {
@@ -715,7 +727,7 @@ const AudioScreen = ({ route, navigation }) => {
             <Image
               source={
                 userInfo?.avatar
-                  ? { uri: userInfo?.avatar }
+                  ? {uri: userInfo?.avatar}
                   : require('./../../images/book2.jpg')
               }
               style={styles.profileImage}
