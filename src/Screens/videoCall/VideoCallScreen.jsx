@@ -437,7 +437,7 @@
 // });
 
 // export default VideoCallScreen;
-import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Platform,
   ScrollView,
@@ -454,7 +454,7 @@ import {
   createAgoraRtcEngine,
 } from 'react-native-agora';
 import requestCameraAndAudioPermission from '../../Components/permissions.js';
-import { SvgXml } from 'react-native-svg';
+import {SvgXml} from 'react-native-svg';
 import {
   SVG_hangout_red,
   SVG_mute_mic,
@@ -464,14 +464,13 @@ import {
   SVG_switch_camera,
   SVG_unmute_mic,
 } from './../../Utils/SVGImage.js';
-import { useWebSocket } from '../../shared/WebSocketProvider.jsx';
-import { useFocusEffect } from '@react-navigation/native';
-
-const { width, height } = Dimensions.get('window');
+import {useWebSocket} from '../../shared/WebSocketProvider.jsx';
+import {useFocusEffect} from '@react-navigation/native';
+const {width, height} = Dimensions.get('window');
 const appId = '1be639d040da4a42be10d134055a2abd';
 
-const VideoCallScreen = ({ route, navigation }) => {
-  const { config, mobile, chatId, userInfo } = route.params || {};
+const VideoCallScreen = ({route, navigation}) => {
+  const {config, mobile, chatId, userInfo} = route.params || {};
   const _engine = useRef(null);
   const [isJoined, setJoined] = useState(false);
   const [peerIds, setPeerIds] = useState([]);
@@ -479,12 +478,12 @@ const VideoCallScreen = ({ route, navigation }) => {
   const [isMicOn, setMicOn] = useState(true);
   const [isCameraOn, setCameraOn] = useState(true);
   const [isSpeakerOn, setSpeakerOn] = useState(true);
-  const { webSocket, leave } = useWebSocket();
+  const {webSocket, leave} = useWebSocket();
   const [callDuration, setCallDuration] = useState('00:00:00');
+  // const [remoteVideoMuted, setRemoteVideoMuted] = useState(false);
 
-  // Handle call duration updates from WebSocket
   useEffect(() => {
-    const handleCallDurationUpdate = (data) => {
+    const handleCallDurationUpdate = data => {
       setCallDuration(data.callDuration);
     };
 
@@ -492,9 +491,8 @@ const VideoCallScreen = ({ route, navigation }) => {
     return () => {
       webSocket.off('updateCallDuration', handleCallDurationUpdate);
     };
-  }, [webSocket]);
+  }, [webSocket, endCall]);
 
-  // Initialize Agora engine and handle permissions
   useFocusEffect(
     useCallback(() => {
       if (Platform.OS === 'android') {
@@ -502,13 +500,16 @@ const VideoCallScreen = ({ route, navigation }) => {
           console.log('Permissions requested!');
         });
       }
-
-      if (!config || !config.channelName || !config.token || typeof config.uid !== 'number') {
+      if (
+        !config ||
+        !config.channelName ||
+        !config.token ||
+        typeof config.uid !== 'number'
+      ) {
         console.error('Invalid config parameters');
         navigation.goBack();
         return;
       }
-
       init();
       return () => {
         if (_engine.current) {
@@ -521,7 +522,6 @@ const VideoCallScreen = ({ route, navigation }) => {
     }, [config, navigation]),
   );
 
-  // Initialize Agora engine
   const init = async () => {
     try {
       _engine.current = createAgoraRtcEngine();
@@ -533,19 +533,20 @@ const VideoCallScreen = ({ route, navigation }) => {
         },
         onUserJoined: (_connection, Uid) => {
           showMessage('Remote user joined with uid ' + Uid);
-          setPeerIds((prev) => [...prev, Uid]);
+          setPeerIds(prev => [...prev, Uid]);
         },
         onUserOffline: (_connection, Uid) => {
           showMessage('Remote user left the channel. uid: ' + Uid);
-          setPeerIds((prev) => prev.filter((id) => id !== Uid));
+          setPeerIds(prev => prev.filter(id => id !== Uid));
         },
         onUserMuteVideo: (_connection, Uid, muted) => {
           if (muted) {
             showMessage('Remote user turned off the camera');
+            // Navigate back to the previous screen if the remote user turns off the camera
             navigation.goBack();
           }
         },
-        onError: (err) => {
+        onError: err => {
           console.error('Agora Error:', err);
           showMessage('Agora Error: ' + JSON.stringify(err));
           setConnectionStatus('Error');
@@ -566,14 +567,13 @@ const VideoCallScreen = ({ route, navigation }) => {
     }
   };
 
-  // Start the call
   const startCall = async () => {
     try {
       await _engine.current?.joinChannel(
         config.token,
         config.channelName,
         config.uid,
-        { clientRoleType: ClientRoleType.ClientRoleBroadcaster },
+        {clientRoleType: ClientRoleType.ClientRoleBroadcaster},
       );
       setConnectionStatus('Connecting...');
     } catch (error) {
@@ -583,8 +583,7 @@ const VideoCallScreen = ({ route, navigation }) => {
     }
   };
 
-  // End the call
-  const endCall = useCallback(async () => {
+  const endCall = async () => {
     try {
       if (_engine.current) {
         await _engine.current.leaveChannel();
@@ -600,98 +599,101 @@ const VideoCallScreen = ({ route, navigation }) => {
     setPeerIds([]);
     setJoined(false);
     setConnectionStatus('Not Connected');
-  }, [leave]);
+  };
 
-  // Toggle microphone
-  const toggleMic = useCallback(() => {
+  const toggleMic = () => {
     _engine.current?.muteLocalAudioStream(!isMicOn);
-    setMicOn((prev) => !prev);
-  }, [isMicOn]);
+    setMicOn(prev => !prev);
+  };
 
-  // Toggle camera
-  const toggleCamera = useCallback(() => {
-    _engine.current?.enableLocalVideo(!isCameraOn);
-    _engine.current?.muteLocalVideoStream(isCameraOn);
-    setCameraOn((prev) => !prev);
-  }, [isCameraOn]);
-
-  // Toggle speaker
-  const toggleSpeaker = useCallback(() => {
-    _engine.current?.setEnableSpeakerphone(!isSpeakerOn);
-    setSpeakerOn((prev) => !prev);
-  }, [isSpeakerOn]);
-
-  // Switch camera
-  const switchCamera = useCallback(() => {
+  const switchCamera = () => {
     _engine.current?.switchCamera();
-  }, []);
+  };
+
+  const toggleCamera = () => {
+    if (isCameraOn) {
+      _engine.current?.enableLocalVideo(true);
+      _engine.current?.muteLocalVideoStream(false);
+      navigation.goBack();
+    } else {
+      _engine.current?.enableLocalVideo(false);
+      _engine.current?.muteLocalVideoStream(true);
+    }
+    setCameraOn(prev => !prev);
+  };
+
+  const toggleSpeaker = () => {
+    _engine.current?.setEnableSpeakerphone(!isSpeakerOn);
+    setSpeakerOn(prev => !prev);
+  };
 
   const showMessage = message => {
-      console.log(message);
-      };
-  // Render remote videos
-  const _renderRemoteVideos = useMemo(() => {
+    console.log(message);
+  };
+
+  const _renderRemoteVideos = () => {
     if (peerIds.length > 0) {
       const id = peerIds[0];
-      return <RtcSurfaceView style={styles.remote} canvas={{ uid: id }} key={id} />;
+      return (
+        <RtcSurfaceView style={styles.remote} canvas={{uid: id}} key={id} />
+      );
     } else {
       return <Text style={styles.text}>No remote video</Text>;
     }
-  }, [peerIds]);
+  };
 
-  // Render all videos
-  const _renderVideos = useMemo(() => (
+  const _renderVideos = () => (
     <View style={styles.fullView}>
       <View style={styles.remoteContainer}>
         <View style={styles.counterContainer}>
           <Text style={styles.callDuration}>{callDuration} mins left</Text>
         </View>
-        {_renderRemoteVideos}
+        {_renderRemoteVideos()}
       </View>
 
       {isCameraOn && (
         <View style={styles.localContainer}>
-          <RtcSurfaceView style={styles.local} canvas={{ uid: 0 }} />
+          <RtcSurfaceView style={styles.local} canvas={{uid: 0}} />
         </View>
       )}
     </View>
-  ), [callDuration, _renderRemoteVideos, isCameraOn]);
-
-  // Render control buttons
-  const renderControlButtons = useMemo(() => (
-    <View style={styles.buttonHolder}>
-      <ControlButton onPress={toggleMic}>
-        {isMicOn ? <SvgXml xml={SVG_unmute_mic} /> : <SvgXml xml={SVG_mute_mic} />}
-      </ControlButton>
-      <ControlButton onPress={switchCamera}>
-        <SvgXml xml={SVG_switch_camera} />
-      </ControlButton>
-      <ControlButton onPress={endCall}>
-        <SvgXml xml={SVG_hangout_red} />
-      </ControlButton>
-      <ControlButton onPress={toggleCamera}>
-        <SvgXml xml={SVG_stop_camera} style={{ marginTop: 8 }} />
-      </ControlButton>
-      <ControlButton onPress={toggleSpeaker}>
-        {isSpeakerOn ? <SvgXml xml={SVG_speaker} /> : <SvgXml xml={SVG_speakeroff} />}
-      </ControlButton>
-    </View>
-  ), [toggleMic, switchCamera, endCall, toggleCamera, toggleSpeaker, isMicOn, isSpeakerOn]);
+  );
 
   return (
     <View style={styles.max}>
-      {isJoined ? _renderVideos : null}
-      {renderControlButtons}
+      {isJoined && _renderVideos()}
+      <View style={styles.buttonHolder}>
+        <TouchableOpacity onPress={toggleMic} style={styles.button}>
+          {isMicOn ? (
+            <SvgXml xml={SVG_unmute_mic} />
+          ) : (
+            <SvgXml xml={SVG_mute_mic} />
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity onPress={switchCamera} style={styles.button}>
+          <SvgXml xml={SVG_switch_camera} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={endCall} style={styles.button}>
+          <SvgXml xml={SVG_hangout_red} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={toggleCamera} style={styles.button}>
+          <SvgXml
+            xml={isCameraOn ? SVG_stop_camera : SVG_stop_camera}
+            className="mt-2"
+          />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={toggleSpeaker} style={styles.button}>
+          {isSpeakerOn ? (
+            <SvgXml xml={SVG_speaker} />
+          ) : (
+            <SvgXml xml={SVG_speakeroff} />
+          )}
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
-// Reusable ControlButton component
-const ControlButton = ({ onPress, children }) => (
-  <TouchableOpacity onPress={onPress} style={styles.button}>
-    {children}
-  </TouchableOpacity>
-);
 const styles = StyleSheet.create({
   max: {
     flex: 1,
@@ -716,7 +718,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.3,
     shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     elevation: 5,
   },
   local: {
@@ -727,7 +729,6 @@ const styles = StyleSheet.create({
   remoteContainer: {
     flex: 1,
     width: '100%',
-    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -769,7 +770,7 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOpacity: 0.3,
         shadowRadius: 5,
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: {width: 0, height: 2},
       },
       android: {
         elevation: 5,
@@ -781,4 +782,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(VideoCallScreen);
+export default VideoCallScreen;
