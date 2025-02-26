@@ -29,11 +29,11 @@ const LoginScreen = ({ navigation }) => {
           const jsonValue = JSON.stringify({ mobile: result.data.data.mobile });
           await AsyncStorage.setItem("loggedin-mobile", jsonValue);
 
-          Snackbar.show({
-            text: `Your OTP is: ${result.data.data?.otp}`,
-            duration: Snackbar.LENGTH_LONG,
-            backgroundColor: "green",
-          });
+          // Snackbar.show({
+          //   text: `Your OTP is: ${result.data.data?.otp}`,
+          //   duration: Snackbar.LENGTH_LONG,
+          //   backgroundColor: "green",
+          // });
 
           navigation.navigate("VerifyCodeScreen");
         }
