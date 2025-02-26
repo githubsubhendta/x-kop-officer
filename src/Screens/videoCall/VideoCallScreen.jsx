@@ -437,10 +437,10 @@
 // });
 
 // export default VideoCallScreen;
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Platform,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -455,7 +455,7 @@ import {
   createAgoraRtcEngine,
 } from 'react-native-agora';
 import requestCameraAndAudioPermission from '../../Components/permissions.js';
-import { SvgXml } from 'react-native-svg';
+import {SvgXml} from 'react-native-svg';
 import {
   SVG_hangout_red,
   SVG_mute_mic,
@@ -465,14 +465,20 @@ import {
   SVG_switch_camera,
   SVG_unmute_mic,
 } from './../../Utils/SVGImage.js';
-import { useWebSocket } from '../../shared/WebSocketProvider.jsx';
-import { useFocusEffect } from '@react-navigation/native';
+import {useWebSocket} from '../../shared/WebSocketProvider.jsx';
+import {useFocusEffect} from '@react-navigation/native';
+import ChatModal from '../../Components/chat/ChatModal.jsx';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import {TextInput} from 'react-native-gesture-handler';
+import Svg, {Path} from 'react-native-svg';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 const appId = '1be639d040da4a42be10d134055a2abd';
 
-const VideoCallScreen = ({ route, navigation }) => {
-  const { config, mobile, chatId, userInfo } = route.params || {};
+const VideoCallScreen = ({route, navigation}) => {
+  const {config, mobile, chatId, userInfo} = route.params || {};
+  const [modelChat, setModelChat] = useState(false);
+  // const slideAnim = useRef(new Animated.Value(0)).current;
   const _engine = useRef(null);
   const [isJoined, setJoined] = useState(false);
   const [peerIds, setPeerIds] = useState([]);
@@ -480,7 +486,7 @@ const VideoCallScreen = ({ route, navigation }) => {
   const [isMicOn, setMicOn] = useState(true);
   const [isCameraOn, setCameraOn] = useState(true);
   const [isSpeakerOn, setSpeakerOn] = useState(true);
-  const { webSocket, leave } = useWebSocket();
+  const {webSocket, leave} = useWebSocket();
   const [callDuration, setCallDuration] = useState('00:00:00');
 
   useEffect(() => {
@@ -495,7 +501,7 @@ const VideoCallScreen = ({ route, navigation }) => {
   }, [webSocket]);
 
   useEffect(() => {
-    const handleAppStateChange = (nextAppState) => {
+    const handleAppStateChange = nextAppState => {
       if (nextAppState === 'active' && _engine.current) {
         console.log('App resumed, restoring audio...');
         _engine.current.enableAudio();
@@ -504,7 +510,10 @@ const VideoCallScreen = ({ route, navigation }) => {
       }
     };
 
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    const subscription = AppState.addEventListener(
+      'change',
+      handleAppStateChange,
+    );
 
     return () => {
       subscription.remove();
@@ -525,7 +534,6 @@ const VideoCallScreen = ({ route, navigation }) => {
         typeof config.uid !== 'number'
       ) {
         console.error('Invalid config parameters');
-        navigation.goBack();
         return;
       }
 
@@ -572,10 +580,10 @@ const VideoCallScreen = ({ route, navigation }) => {
         onUserMuteVideo: (_connection, Uid, muted) => {
           if (muted) {
             showMessage('Remote user turned off the camera');
-            navigation.goBack();
+            // navigation.goBack();  // Remove or comment out this line
           }
         },
-        onAudioRouteChanged: (routing) => {
+        onAudioRouteChanged: routing => {
           console.log('Audio route changed:', routing);
           if (isSpeakerOn) {
             _engine.current.setEnableSpeakerphone(true);
@@ -602,13 +610,24 @@ const VideoCallScreen = ({ route, navigation }) => {
     }
   };
 
+  ///////////// chat modal
+
+  const handleClose = useCallback(() => setModelChat(false), []);
+
+  const chatModal = useMemo(
+    () => (
+      <ChatModal chatId={chatId} isVisible={modelChat} onClose={handleClose} />
+    ),
+    [chatId, modelChat, handleClose],
+  );
+
   const startCall = async () => {
     try {
       await _engine.current?.joinChannel(
         config.token,
         config.channelName,
         config.uid,
-        { clientRoleType: ClientRoleType.ClientRoleBroadcaster },
+        {clientRoleType: ClientRoleType.ClientRoleBroadcaster},
       );
       setConnectionStatus('Connecting...');
     } catch (error) {
@@ -648,14 +667,26 @@ const VideoCallScreen = ({ route, navigation }) => {
     _engine.current?.switchCamera();
   };
 
+  // const toggleCamera = () => {
+  //   if (isCameraOn) {
+  //     _engine.current?.enableLocalVideo(true);
+  //     _engine.current?.muteLocalVideoStream(false);
+  //     // navigation.goBack();
+  //   } else {
+  //     _engine.current?.enableLocalVideo(false);
+  //     _engine.current?.muteLocalVideoStream(true);
+  //   }
+  //   setCameraOn(prev => !prev);
+  // };
   const toggleCamera = () => {
     if (isCameraOn) {
-      _engine.current?.enableLocalVideo(true);
-      _engine.current?.muteLocalVideoStream(false);
-      navigation.goBack();
-    } else {
+      // Disable local video stream
       _engine.current?.enableLocalVideo(false);
       _engine.current?.muteLocalVideoStream(true);
+    } else {
+      // Enable local video stream
+      _engine.current?.enableLocalVideo(true);
+      _engine.current?.muteLocalVideoStream(false);
     }
     setCameraOn(prev => !prev);
   };
@@ -676,7 +707,7 @@ const VideoCallScreen = ({ route, navigation }) => {
     if (peerIds.length > 0) {
       const id = peerIds[0];
       return (
-        <RtcSurfaceView style={styles.remote} canvas={{ uid: id }} key={id} />
+        <RtcSurfaceView style={styles.remote} canvas={{uid: id}} key={id} />
       );
     } else {
       return <Text style={styles.text}>No remote video</Text>;
@@ -694,7 +725,7 @@ const VideoCallScreen = ({ route, navigation }) => {
 
       {isCameraOn && (
         <View style={styles.localContainer}>
-          <RtcSurfaceView style={styles.local} canvas={{ uid: 0 }} />
+          <RtcSurfaceView style={styles.local} canvas={{uid: 0}} />
         </View>
       )}
     </View>
@@ -723,6 +754,22 @@ const VideoCallScreen = ({ route, navigation }) => {
             className="mt-2"
           />
         </TouchableOpacity>
+        <View>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => setModelChat(true)}>
+            <Svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 576 512"
+              width={28}
+              height={28}
+              fill="#000">
+              <Path d="M284 224.8a34.1 34.1 0 1 0 34.3 34.1A34.2 34.2 0 0 0 284 224.8zm-110.5 0a34.1 34.1 0 1 0 34.3 34.1A34.2 34.2 0 0 0 173.6 224.8zm220.9 0a34.1 34.1 0 1 0 34.3 34.1A34.2 34.2 0 0 0 394.5 224.8zm153.8-55.3c-15.5-24.2-37.3-45.6-64.7-63.6-52.9-34.8-122.4-54-195.7-54a406 406 0 0 0 -72 6.4 238.5 238.5 0 0 0 -49.5-36.6C99.7-11.7 40.9 .7 11.1 11.4A14.3 14.3 0 0 0 5.6 34.8C26.5 56.5 61.2 99.3 52.7 138.3c-33.1 33.9-51.1 74.8-51.1 117.3 0 43.4 18 84.2 51.1 118.1 8.5 39-26.2 81.8-47.1 103.5a14.3 14.3 0 0 0 5.6 23.3c29.7 10.7 88.5 23.1 155.3-10.2a238.7 238.7 0 0 0 49.5-36.6A406 406 0 0 0 288 460.1c73.3 0 142.8-19.2 195.7-54 27.4-18 49.1-39.4 64.7-63.6 17.3-26.9 26.1-55.9 26.1-86.1C574.4 225.4 565.6 196.4 548.3 169.5zM285 409.9a345.7 345.7 0 0 1 -89.4-11.5l-20.1 19.4a184.4 184.4 0 0 1 -37.1 27.6 145.8 145.8 0 0 1 -52.5 14.9c1-1.8 1.9-3.6 2.8-5.4q30.3-55.7 16.3-100.1c-33-26-52.8-59.2-52.8-95.4 0-83.1 104.3-150.5 232.8-150.5s232.9 67.4 232.9 150.5C517.9 342.5 413.6 409.9 285 409.9z" />
+            </Svg>
+          </TouchableOpacity>
+        </View>
+        {chatModal}
+
         <TouchableOpacity onPress={toggleSpeaker} style={styles.button}>
           {isSpeakerOn ? (
             <SvgXml xml={SVG_speaker} />
@@ -759,7 +806,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.3,
     shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     elevation: 5,
   },
   local: {
@@ -800,8 +847,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   button: {
-    width: 60,
-    height: 60,
+    width: 45,
+    height: 45,
     borderRadius: 31,
     backgroundColor: '#fff',
     justifyContent: 'center',
@@ -811,7 +858,7 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOpacity: 0.3,
         shadowRadius: 5,
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: {width: 0, height: 2},
       },
       android: {
         elevation: 5,

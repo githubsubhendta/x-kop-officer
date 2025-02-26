@@ -460,6 +460,7 @@ import {
 import {useWebSocket} from '../../shared/WebSocketProvider.jsx';
 import ChatModal from '../../Components/chat/ChatModal.jsx';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useFocusEffect } from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 
@@ -526,18 +527,18 @@ const AudioScreen = ({route, navigation}) => {
     }
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      const initializeEngine = async () => {
-        if (engine.current) {
-          await engine.current.enableAudio();
-          await engine.current.setEnableSpeakerphone(isSpeakerEnabled);
-          await engine.current.muteLocalAudioStream(isMuted);
-        }
-      };
-      initializeEngine();
-    }, [engine, isSpeakerEnabled, isMuted]),
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const initializeEngine = async () => {
+  //       if (engine.current) {
+  //         await engine.current.enableAudio();
+  //         await engine.current.setEnableSpeakerphone(isSpeakerEnabled);
+  //         await engine.current.muteLocalAudioStream(isMuted);
+  //       }
+  //     };
+  //     initializeEngine();
+  //   }, [engine, isSpeakerEnabled, isMuted]),
+  // );
 
   useEffect(() => {
     requestPermissions();
