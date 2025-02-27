@@ -580,7 +580,7 @@ const VideoCallScreen = ({route, navigation}) => {
         onUserMuteVideo: (_connection, Uid, muted) => {
           if (muted) {
             showMessage('Remote user turned off the camera');
-            // navigation.goBack();  // Remove or comment out this line
+          
           }
         },
         onAudioRouteChanged: routing => {
@@ -610,7 +610,7 @@ const VideoCallScreen = ({route, navigation}) => {
     }
   };
 
-  ///////////// chat modal
+  ///////////// chat modal /////////////
 
   const handleClose = useCallback(() => setModelChat(false), []);
 
@@ -657,7 +657,7 @@ const VideoCallScreen = ({route, navigation}) => {
 
   const toggleMic = () => {
     const newMicStatus = !isMicOn;
-    _engine.current?.muteLocalAudioStream(!newMicStatus); // Fix: Ensure correct inversion
+    _engine.current?.muteLocalAudioStream(!newMicStatus); 
     setMicOn(newMicStatus);
     console.log('Microphone toggled:', newMicStatus);
 };
@@ -666,17 +666,6 @@ const VideoCallScreen = ({route, navigation}) => {
     _engine.current?.switchCamera();
   };
 
-  // const toggleCamera = () => {
-  //   if (isCameraOn) {
-  //     _engine.current?.enableLocalVideo(true);
-  //     _engine.current?.muteLocalVideoStream(false);
-  //     // navigation.goBack();
-  //   } else {
-  //     _engine.current?.enableLocalVideo(false);
-  //     _engine.current?.muteLocalVideoStream(true);
-  //   }
-  //   setCameraOn(prev => !prev);
-  // };
   const toggleCamera = () => {
     if (isCameraOn) {
       // Disable local video stream

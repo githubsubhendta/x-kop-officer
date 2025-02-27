@@ -52,6 +52,7 @@
     "react-native-screens": "^3.30.1",
     "react-native-slider": "^0.11.0",
     "react-native-snackbar": "^2.6.2",
+    "react-native-sound": "^0.11.2",
     "react-native-svg": "^15.2.0",
     "react-native-swiper": "^1.6.0",
     "react-native-vector-icons": "^10.0.3",
