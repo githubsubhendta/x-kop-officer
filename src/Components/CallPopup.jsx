@@ -98,15 +98,17 @@ const styles = StyleSheet.create({
 export default CallPopup;
 
 // import React from 'react';
-// import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+// import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 // import Modal from 'react-native-modal';
-// import {SvgXml} from 'react-native-svg';
+// import { SvgXml } from 'react-native-svg';
 // import book from '../images/book2.jpg';
-// import {SVG_hangout_white, SVG_phone} from '../Utils/SVGImage';
+// import { SVG_hangout_white, SVG_phone } from '../Utils/SVGImage';
 // import useUserStore from '../stores/user.store';
+// import useRingtone from '../hooks/useRingtone';
 
-// const CallPopup = ({isVisible, onAccept, onReject, userInfo}) => {
-//   const {user} = useUserStore();
+// const CallPopup = ({ isVisible, onAccept, onReject, userInfo }) => {
+//   const { user } = useUserStore();
+//   const { stopRingtone } = useRingtone(isVisible);
 
 //   return (
 //     <Modal
@@ -118,155 +120,30 @@ export default CallPopup;
 //       useNativeDriver={true}>
 //       <View style={styles.popupContainer}>
 //         <Image
-//           source={
-//             userInfo.current?.avatar ? {uri: userInfo.current?.avatar} : book
-//           }
+//           source={userInfo.current?.avatar ? { uri: userInfo.current?.avatar } : book}
 //           style={styles.avatar}
 //         />
 //         <Text style={styles.name}>
 //           {userInfo.current?.name || 'Unknown Caller'}
 //         </Text>
 //         <Text style={styles.details}>
-//           {user?.officerDetails?.ConsultationTypeID?.ConsultationTypeName ||
-//             'Consultation Type'}
+//           {user?.officerDetails?.ConsultationTypeID?.ConsultationTypeName || 'Consultation Type'}
 //         </Text>
 //         <View style={styles.actions}>
-//           <TouchableOpacity onPress={onAccept} style={styles.acceptButton}>
+//           <TouchableOpacity
+//             onPress={() => {
+//               stopRingtone();
+//               onAccept();
+//             }}
+//             style={styles.acceptButton}>
 //             <SvgXml xml={SVG_phone} height="40px" width="40px" />
 //           </TouchableOpacity>
 //           <TouchableOpacity
-//             onPress={() => onReject()}
+//             onPress={() => {
+//               stopRingtone();
+//               onReject();
+//             }}
 //             style={styles.rejectButton}>
-//             <SvgXml xml={SVG_hangout_white} height="40px" width="40px" />
-//           </TouchableOpacity>
-//         </View>
-//       </View>
-//     </Modal>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   modal: {
-//     justifyContent: 'flex-start',
-//     marginTop: 0,
-//   },
-//   popupContainer: {
-//     backgroundColor: '#fff',
-//     padding: 20,
-//     borderRadius: 16,
-//     alignItems: 'center',
-//     marginTop: 20,
-//   },
-//   avatar: {
-//     width: 80,
-//     height: 80,
-//     borderRadius: 40,
-//     marginBottom: 16,
-//   },
-//   name: {
-//     fontSize: 18,
-//     fontWeight: '600',
-//     color: '#000',
-//     marginBottom: 8,
-//   },
-//   details: {
-//     fontSize: 14,
-//     fontWeight: '400',
-//     color: '#606060',
-//     marginBottom: 24,
-//   },
-//   actions: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-around',
-//     width: '100%',
-//   },
-//   acceptButton: {
-//     backgroundColor: '#4CAF50',
-//     padding: 16,
-//     borderRadius: 32,
-//     alignItems: 'center',
-//   },
-//   rejectButton: {
-//     backgroundColor: '#F44336',
-//     padding: 16,
-//     borderRadius: 32,
-//     alignItems: 'center',
-//   },
-// });
-
-// export default CallPopup;
-
-
-// import React, { useEffect, useState } from 'react';
-// import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
-// import Modal from 'react-native-modal';
-// import { SvgXml } from 'react-native-svg';
-// import Sound from 'react-native-sound';
-// import book from '../images/book2.jpg';
-// import { SVG_hangout_white, SVG_phone } from '../Utils/SVGImage';
-// import useUserStore from '../stores/user.store';
-
-// const CallPopup = ({ isVisible, onAccept, onReject, userInfo }) => {
-//   const { user } = useUserStore();
-//   const [ringtone, setRingtone] = useState(null);
-
-//   useEffect(() => {
-//     if (isVisible) {
-//       const sound = new Sound('ringtone.mp3', Sound.MAIN_BUNDLE, (error) => {
-//         if (error) {
-//           console.log('Failed to load the sound', error);
-//           return;
-//         }
-//         sound.play((success) => {
-//           if (!success) {
-//             console.log('Playback failed due to audio decoding errors');
-//           }
-//         });
-//       });
-
-//       setRingtone(sound);
-
-//       return () => {
-//         if (sound) {
-//           sound.stop();
-//           sound.release();
-//         }
-//       };
-//     }
-//   }, [isVisible]);
-
-//   const handleAccept = () => {
-//     if (ringtone) {
-//       ringtone.stop();
-//       ringtone.release();
-//     }
-//     onAccept();
-//   };
-
-//   const handleReject = () => {
-//     if (ringtone) {
-//       ringtone.stop();
-//       ringtone.release();
-//     }
-//     onReject();
-//   };
-
-//   // Null checks for userInfo and user
-//   const avatarSource = userInfo?.current?.avatar ? { uri: userInfo.current.avatar } : book;
-//   const name = userInfo?.current?.name || 'Unknown Caller';
-//   const details = user?.officerDetails?.ConsultationTypeID?.ConsultationTypeName || 'Consultation Type';
-
-//   return (
-//     <Modal isVisible={isVisible} style={styles.modal}>
-//       <View style={styles.popupContainer}>
-//         <Image source={avatarSource} style={styles.avatar} />
-//         <Text style={styles.name}>{name}</Text>
-//         <Text style={styles.details}>{details}</Text>
-//         <View style={styles.actions}>
-//           <TouchableOpacity onPress={handleAccept} style={styles.acceptButton}>
-//             <SvgXml xml={SVG_phone} height="40px" width="40px" />
-//           </TouchableOpacity>
-//           <TouchableOpacity onPress={handleReject} style={styles.rejectButton}>
 //             <SvgXml xml={SVG_hangout_white} height="40px" width="40px" />
 //           </TouchableOpacity>
 //         </View>
