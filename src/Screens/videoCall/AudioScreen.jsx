@@ -460,7 +460,8 @@ import {
 import {useWebSocket} from '../../shared/WebSocketProvider.jsx';
 import ChatModal from '../../Components/chat/ChatModal.jsx';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
+import CustomModal from '../../Components/CustomModal.jsx';
 
 const {width, height} = Dimensions.get('window');
 
@@ -474,6 +475,8 @@ const AudioScreen = ({route, navigation}) => {
   const [modelChat, setModelChat] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [callDuration, setCallDuration] = useState('00:00:00');
+  const [showVideoCallModal, setShowVideoCallModal] = useState(false);
+
 
   const {engine, isJoined} = useAgoraEngine(
     config,
@@ -642,30 +645,52 @@ const AudioScreen = ({route, navigation}) => {
     }
   }, [engine, webSocket, mobile]);
 
-  const createTwoButtonAlert = useCallback(() => {
-    Alert.alert('Call', 'Requesting for Video Call', [
-      {
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel',
-      },
-      {
-        text: 'OK',
-        onPress: async () => {
-          webSocket.emit('VideoCallanswerCall', {callerId: mobile});
-          await engine.current?.leaveChannel();
-          setTimeout(() => {
-            navigation.navigate('VideoCallScreen', {
-              config,
-              mobile,
-              chatId,
-              userInfo,
-            });
-          }, 300);
-        },
-      },
-    ]);
-  }, [webSocket, engine, mobile, navigation, config, chatId, userInfo]);
+  // const createTwoButtonAlert = useCallback(() => {
+  //   Alert.alert('Call', 'Requesting for Video Call', [
+  //     {
+  //       text: 'Cancel',
+  //       onPress: () => console.log('Cancel Pressed'),
+  //       style: 'cancel',
+  //     },
+  //     {
+  //       text: 'OK',
+  //       onPress: async () => {
+  //         webSocket.emit('VideoCallanswerCall', {callerId: mobile});
+  //         await engine.current?.leaveChannel();
+  //         setTimeout(() => {
+  //           navigation.navigate('VideoCallScreen', {
+  //             config,
+  //             mobile,
+  //             chatId,
+  //             userInfo,
+  //           });
+  //         }, 300);
+  //       },
+  //     },
+  //   ]);
+  // }, [webSocket, engine, mobile, navigation, config, chatId, userInfo]);
+
+  const createTwoButtonAlert = () => {
+    setShowVideoCallModal(true);
+  };
+
+  const handleVideoCallModalClose = () => {
+    setShowVideoCallModal(false);
+  };
+
+  const handleVideoCallConfirm = async () => {
+    setShowVideoCallModal(false);
+    webSocket.emit('VideoCallanswerCall', {callerId: mobile});
+    await engine.current?.leaveChannel();
+    setTimeout(() => {
+      navigation.navigate('VideoCallScreen', {
+        config,
+        mobile,
+        chatId,
+        userInfo,
+      });
+    }, 300);
+  };
 
   useEffect(() => {
     webSocket.on('newVideoCall', createTwoButtonAlert);
@@ -795,6 +820,19 @@ const AudioScreen = ({route, navigation}) => {
           {chatModal}
         </View>
       )}
+
+      <CustomModal
+        isVisible={showVideoCallModal}
+        onClose={handleVideoCallModalClose}
+        message="Requesting for Video Call"
+        buttons={[
+          {label: 'Cancel', onPress: handleVideoCallModalClose, color: 'gray'},
+          {
+            label: 'OK',
+            onPress: handleVideoCallConfirm,
+          },
+        ]}
+      />
     </View>
   );
 };

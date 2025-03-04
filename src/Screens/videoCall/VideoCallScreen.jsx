@@ -705,27 +705,55 @@ const VideoCallScreen = ({route, navigation}) => {
     }
   };
 
+  // const _renderVideos = () => (
+  //   <View style={styles.fullView}>
+  //     <View style={styles.splitContainer}>
+  //     <View style={styles.remoteContainer}>
+  //       <View style={styles.counterContainer}>
+  //         <Text style={styles.callDuration}>{callDuration} mins left</Text>
+  //       </View>
+  //       {_renderRemoteVideos()}
+  //     </View>
+
+  //     {isCameraOn ? (
+  //       <View style={styles.localContainer}>
+  //         <RtcSurfaceView style={styles.local} canvas={{uid: 0}} />
+  //       </View>
+  //     ) : (
+  //       <View style={styles.localContainer2}>
+  //         <Svg width={50} height={50} viewBox="0 0 640 512" fill="white">
+  //           <Path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7l-86.4-67.7 13.8 9.2c9.8 6.5 22.4 7.2 32.9 1.6s16.9-16.4 16.9-28.2l0-256c0-11.8-6.5-22.6-16.9-28.2s-23-5-32.9 1.6l-96 64L448 174.9l0 17.1 0 128 0 5.8-32-25.1L416 128c0-35.3-28.7-64-64-64L113.9 64 38.8 5.1zM407 416.7L32.3 121.5c-.2 2.1-.3 4.3-.3 6.5l0 256c0 35.3 28.7 64 64 64l256 0c23.4 0 43.9-12.6 55-31.3z" />
+  //         </Svg>
+  //         <Text style={styles.cameraOffText}>Camera is off</Text>
+  //       </View>
+  //     )}
+  //   </View>
+  //   </View>
+
+  // );
+
   const _renderVideos = () => (
     <View style={styles.fullView}>
-      <View style={styles.remoteContainer}>
-        <View style={styles.counterContainer}>
-          <Text style={styles.callDuration}>{callDuration} mins left</Text>
+      <View style={styles.splitContainer}>
+        <View style={styles.remoteContainer}>
+          {_renderRemoteVideos()}
         </View>
-        {_renderRemoteVideos()}
+        {isCameraOn ? (
+          <View style={styles.localContainer}>
+            <RtcSurfaceView style={styles.local} canvas={{uid: 0}} />
+          </View>
+        ) : (
+          <View style={styles.localContainer2}>
+            <Svg width={50} height={50} viewBox="0 0 640 512" fill="white">
+              <Path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7l-86.4-67.7 13.8 9.2c9.8 6.5 22.4 7.2 32.9 1.6s16.9-16.4 16.9-28.2l0-256c0-11.8-6.5-22.6-16.9-28.2s-23-5-32.9 1.6l-96 64L448 174.9l0 17.1 0 128 0 5.8-32-25.1L416 128c0-35.3-28.7-64-64-64L113.9 64 38.8 5.1zM407 416.7L32.3 121.5c-.2 2.1-.3 4.3-.3 6.5l0 256c0 35.3 28.7 64 64 64l256 0c23.4 0 43.9-12.6 55-31.3z" />
+            </Svg>
+            <Text style={styles.cameraOffText}>Camera is off</Text>
+          </View>
+        )}
       </View>
-
-      {isCameraOn ? (
-        <View style={styles.localContainer}>
-          <RtcSurfaceView style={styles.local} canvas={{uid: 0}} />
-        </View>
-      ) : (
-        <View style={styles.localContainer2}>
-          <Svg width={50} height={50} viewBox="0 0 640 512" fill="white">
-            <Path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7l-86.4-67.7 13.8 9.2c9.8 6.5 22.4 7.2 32.9 1.6s16.9-16.4 16.9-28.2l0-256c0-11.8-6.5-22.6-16.9-28.2s-23-5-32.9 1.6l-96 64L448 174.9l0 17.1 0 128 0 5.8-32-25.1L416 128c0-35.3-28.7-64-64-64L113.9 64 38.8 5.1zM407 416.7L32.3 121.5c-.2 2.1-.3 4.3-.3 6.5l0 256c0 35.3 28.7 64 64 64l256 0c23.4 0 43.9-12.6 55-31.3z" />
-          </Svg>
-          <Text style={styles.cameraOffText}>Camera is off</Text>
-        </View>
-      )}
+      <View style={styles.counterContainer}>
+        <Text style={styles.callDuration}>{callDuration} mins left</Text>
+      </View>
     </View>
   );
 
@@ -790,39 +818,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  splitContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '100%',
+  },
   localContainer: {
-    position: 'absolute',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#000',
-    bottom: 10,
-    right: 20,
-    width: 120,
-    height: 170,
-    borderRadius: 14,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#fff',
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    shadowOffset: {width: 0, height: 2},
-    elevation: 5,
   },
   local: {
     width: '100%',
     height: '100%',
-    borderRadius: 12,
   },
   remoteContainer: {
     flex: 1,
-    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
+    backgroundColor: '#000',
   },
   remote: {
-    width: width - 10,
-    height: height / 2.6,
-    borderRadius: 10,
+    width: '100%',
+    height: '100%',
   },
   counterContainer: {
     position: 'absolute',
@@ -834,9 +854,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   callDuration: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    position: 'absolute',
+    top: 10,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    paddingVertical: 5,
+    paddingHorizontal: 16,
+    borderRadius: 20,
   },
   buttonHolder: {
     flexDirection: 'row',
@@ -867,18 +891,10 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   localContainer2: {
-    position: 'absolute',
-    backgroundColor: '#000',
-    bottom: 10,
-    right: 20,
-    width: 120,
-    height: 170,
-    borderRadius: 14,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#fff',
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#000',
   },
   cameraOffText: {
     color: 'white',
