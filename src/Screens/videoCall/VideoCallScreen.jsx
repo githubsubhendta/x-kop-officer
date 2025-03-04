@@ -854,13 +854,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   callDuration: {
-    position: 'absolute',
-    top: 10,
-    alignSelf: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    paddingVertical: 5,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   buttonHolder: {
     flexDirection: 'row',
@@ -891,7 +887,6 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   localContainer2: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#000',
