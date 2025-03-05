@@ -1,14 +1,46 @@
-
-import React from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, Dimensions, Animated } from 'react-native';
 
 const { width, height } = Dimensions.get('window'); // Get screen dimensions
 
 const CustomModal = ({ isVisible, onClose, message, buttons = [] }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  const scaleAnim = useRef(new Animated.Value(0.8)).current; // Initial value for scale: 0.8
+
+  useEffect(() => {
+    if (isVisible) {
+      // Animate the modal to fade in and scale up when it becomes visible
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      // Reset the animations when the modal is not visible
+      fadeAnim.setValue(0);
+      scaleAnim.setValue(0.8);
+    }
+  }, [isVisible, fadeAnim, scaleAnim]);
+
   return (
-    <Modal visible={isVisible} animationType="slide" transparent>
+    <Modal visible={isVisible} animationType="none" transparent>
       <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
+        <Animated.View
+          style={[
+            styles.modalContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ scale: scaleAnim }],
+            },
+          ]}
+        >
           <Text style={styles.message}>{message}</Text>
           <View style={styles.buttonContainer}>
             {buttons.map((btn, index) => (
@@ -21,7 +53,7 @@ const CustomModal = ({ isVisible, onClose, message, buttons = [] }) => {
               </TouchableOpacity>
             ))}
           </View>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
@@ -35,7 +67,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
-    width: width * 0.8, // 80% of screen width
+    width: width * 0.9, // 80% of screen width
     maxWidth: 400, // Maximum width for larger screens
     backgroundColor: '#fff',
     padding: 20,

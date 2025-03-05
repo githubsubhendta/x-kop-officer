@@ -476,7 +476,7 @@ const AudioScreen = ({route, navigation}) => {
   const [isRecording, setIsRecording] = useState(false);
   const [callDuration, setCallDuration] = useState('00:00:00');
   const [showVideoCallModal, setShowVideoCallModal] = useState(false);
-
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const {engine, isJoined} = useAgoraEngine(
     config,
@@ -560,17 +560,31 @@ const AudioScreen = ({route, navigation}) => {
     return `${directoryPath}/call_recording_${Date.now()}.aac`;
   }, []);
 
+  // const confirmAndStartRecording = () => {
+  //   Alert.alert('Start Recording', 'Do you want to start recording?', [
+  //     {
+  //       text: 'Cancel',
+  //       style: 'cancel',
+  //     },
+  //     {
+  //       text: 'OK',
+  //       onPress: startRecording,
+  //     },
+  //   ]);
+  // };
+
+
   const confirmAndStartRecording = () => {
-    Alert.alert('Start Recording', 'Do you want to start recording?', [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-      {
-        text: 'OK',
-        onPress: startRecording,
-      },
-    ]);
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false); 
+  };
+
+  const handleOK = () => {
+    setIsModalVisible(false); 
+    startRecording(); 
   };
 
   const startRecording = async () => {
@@ -611,7 +625,7 @@ const AudioScreen = ({route, navigation}) => {
       try {
         await engine.current.stopAudioRecording();
         setIsRecording(false);
-        Alert.alert('Recording Stopped');
+        // Alert.alert('Recording Stopped');
       } catch (error) {
         console.error('Error stopping recording:', error);
       }
@@ -830,6 +844,24 @@ const AudioScreen = ({route, navigation}) => {
           {
             label: 'OK',
             onPress: handleVideoCallConfirm,
+          },
+        ]}
+      />
+
+<CustomModal
+        isVisible={isModalVisible}
+        onClose={handleCancel}
+        message="Do you want to start recording?"
+        buttons={[
+          {
+            label: 'Cancel',
+            onPress: handleCancel,
+            color: 'gray'
+          },
+          {
+            label: 'OK',
+            onPress: handleOK,
+            
           },
         ]}
       />
