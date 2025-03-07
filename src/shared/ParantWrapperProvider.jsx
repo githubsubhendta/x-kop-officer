@@ -14,7 +14,7 @@ const ParantWrapperProvider = ({children}) => {
     const currentRoute = getCurrentRoute();
    
   useEffect(()=>{
-    console.log("check fcmToken fcm token===",fcmToken)
+    // console.log("check fcmToken fcm token===",fcmToken)
     if (webSocket && fcmToken) {
        webSocket.emit('onLive', {
       status: true,
