@@ -405,17 +405,22 @@ const ScheduleScreen = () => {
           transparent={true}>
           <View className="flex-1 justify-center items-center bg-black bg-opacity-70">
             <View className="bg-white p-6 rounded-lg w-4/5 max-h-4/5">
-              <View className="flex-row mb-5">
+              <View className="flex-row items-center justify-between mb-5 px-4">
+                {/* Customer Avatar */}
                 <Image
                   source={{uri: modalData.customer.avatar}}
-                  className="w-10 h-10 rounded-full mr-3"
+                  className="w-12 h-12 rounded-full"
                 />
-                <Text className="text-lg font-bold text-gray-800 flex-1">
+
+                {/* Customer Name */}
+                <Text className="text-base font-bold text-gray-900 flex-1 text-center">
                   {modalData.customer.name}
                 </Text>
+
+                {/* Officer Avatar */}
                 <Image
                   source={{uri: modalData.officer.avatar}}
-                  className="w-10 h-10 rounded-full"
+                  className="w-12 h-12 rounded-full"
                 />
               </View>
 

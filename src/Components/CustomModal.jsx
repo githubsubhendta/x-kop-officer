@@ -18,7 +18,7 @@ const CustomModal = ({ isVisible, onClose, message, buttons = [] }) => {
         }),
         Animated.timing(scaleAnim, {
           toValue: 1,
-          duration: 300,
+          duration: 200,
           useNativeDriver: true,
         }),
       ]).start();
@@ -67,8 +67,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
-    width: width * 0.9, // 80% of screen width
-    maxWidth: 400, // Maximum width for larger screens
+    width: width * 0.9, 
+    maxWidth: 400, 
     backgroundColor: '#fff',
     padding: 20,
     borderRadius: 10,
