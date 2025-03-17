@@ -7,7 +7,7 @@ import Snackbar from "react-native-snackbar";
 
 const LoginScreen = ({ navigation }) => {
   const [mobile, setMobile] = useState(null);
-  const [otp, setOtp] = useState(null); // State to store the OTP
+  const [otp, setOtp] = useState(null); 
 
   const handleLoginSubmit = async () => {
     if (mobile == "") {
@@ -30,7 +30,7 @@ const LoginScreen = ({ navigation }) => {
           await AsyncStorage.setItem("loggedin-mobile", jsonValue);
 
           // Snackbar.show({
-          //   text: `Your OTP is: ${result.data.data?.otp}`,
+          //   text: `Your OTP is sent`,
           //   duration: Snackbar.LENGTH_LONG,
           //   backgroundColor: "green",
           // });
