@@ -209,7 +209,7 @@ const HomeScreen = ({navigation}) => {
                     : 'N/A'}{' '}
                   To {}
                   {showModal.data?.schedule?.endTime
-                    ? new Date(showModal.data.schedule.endTime)
+                    ? showModal.data.schedule.endTime
                         .toLocaleString()
                         .replace(/:00\b/, '')
                     : 'N/A'}
@@ -411,7 +411,8 @@ const styles = StyleSheet.create({
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 20,
+    justifyContent: 'center',
+    paddingHorizontal: width * 0.04,
   },
   avatar: {
     width: width * 0.13, 
