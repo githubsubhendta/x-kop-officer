@@ -102,10 +102,17 @@ const AppointmnetListModel = ({
             <Text style={styles.cardName}>{item.customer.name}</Text>
             <Text style={styles.cardDate}>{formatDate(item.startTime)}</Text>
           </View>
+          {/* <TouchableOpacity
+            onPress={() => {
+              showDetails(item);
+            }}
+            style={styles.viewDetailsButton}>
+            <Text style={styles.viewDetailsText}>View Details</Text>
+          </TouchableOpacity> */}
         </View>
         <View style={styles.cardFooter}>
           <TouchableOpacity onPress={() => {}} style={styles.rescheduleButton}>
-            <Text style={styles.rescheduleText}>Re-Schedule</Text>
+            {/* <Text style={styles.rescheduleText}>Re-Schedule</Text> */}
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -204,11 +211,11 @@ const styles = StyleSheet.create({
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 20,
   },
   avatar: {
-    width: 56,
-    height: 56,
+    width: 52,
+    height: 52,
     borderRadius: 28,
   },
   cardName: {
@@ -249,14 +256,15 @@ const styles = StyleSheet.create({
     color: '#997654',
   },
   viewDetailsButton: {
-    backgroundColor: '#862A0D',
-    padding: 6,
+    // backgroundColor: '#862A0D',
+    padding: 3,
     borderRadius: 20,
   },
   viewDetailsText: {
     fontSize: 14,
-    color: '#fff',
+    color: '#000',
     paddingHorizontal: 12,
+    textDecorationLine: 'underline',
   },
   insights: {
     backgroundColor: '#F3EADB',

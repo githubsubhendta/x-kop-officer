@@ -87,6 +87,7 @@ const HomeScreen = ({navigation}) => {
 
   const handleViewDetails = selectedScheduleData => {
     setShowModal({status: true, data: selectedScheduleData});
+    
   };
 
   const showDetails = item => {
@@ -289,7 +290,7 @@ const AppointmentCard = ({name, date, schedule, handleViewDetails}) => (
       </View>
       <View style={styles.cardFooter}>
         <TouchableOpacity onPress={() => {}} style={styles.rescheduleButton}>
-          <Text style={styles.rescheduleText}>Re-Schedule</Text>
+          {/* <Text style={styles.rescheduleText}>Re-Schedule</Text> */}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => handleViewDetails({name, date, schedule})}
@@ -401,20 +402,19 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   card: {
+    marginVertical: 8,
     backgroundColor: '#fff',
     borderColor: '#D9D9D9',
     borderWidth: 2,
-    borderRadius: 8,
     // paddingHorizontal: width * 0.04, // Dynamic padding
   },
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: width * 0.04,
+    gap: 20,
   },
   avatar: {
-    width: width * 0.13, // Scales dynamically
+    width: width * 0.13, 
     height: width * 0.13,
     borderRadius: width * 0.065,
   },
@@ -463,14 +463,15 @@ const styles = StyleSheet.create({
     color: '#997654',
   },
   viewDetailsButton: {
-    backgroundColor: '#862A0D',
-    padding: 6,
+    // backgroundColor: '#862A0D',
+    padding: 3,
     borderRadius: 20,
   },
   viewDetailsText: {
     fontSize: 14,
-    color: '#fff',
+    color: '#000',
     paddingHorizontal: 12,
+    textDecorationLine: 'underline',
   },
   insights: {
     backgroundColor: '#F3EADB',
