@@ -3,7 +3,7 @@ import React from 'react';
 import Icon from "react-native-vector-icons/AntDesign";
 
 const EndCallScreen = ({route,navigation }) => {
-    const { chatId,userInfo } = route.params;
+    const { chatId,userInfo } = route.params || {};
 
     return (
         <View className="flex-1 flex justify-center items-center h-[100vh] relative px-4">

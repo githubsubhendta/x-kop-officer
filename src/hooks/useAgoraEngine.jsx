@@ -423,3 +423,421 @@ export default useAgoraEngine;
 // };
 
 // export default useAgoraEngine;
+//           config.token,
+//           config.channelName,
+//           config.uid,
+//           { clientRoleType: ClientRoleType.ClientRoleBroadcaster }
+//         );
+//         console.log('Join channel command sent');
+//       } catch (error) {
+//         console.error('Engine setup or join failed:', error);
+//         setError(error);
+//         onError(error);
+//       }
+//     };
+
+//     init();
+
+//     return () => {
+//       console.log('Component unmounting, engine persists');
+//     };
+//   }, [config, onJoinSuccess, onUserJoined, onUserOffline, onError]);
+
+//   const leaveChannel = async () => {
+//     try {
+//       if (globalEngine && isJoined) {
+//         await globalEngine.leaveChannel();
+//         console.log('Channel left successfully');
+//         setIsJoined(false);
+//         setPeerIds([]);
+//       }
+//     } catch (err) {
+//       console.error('Leave channel failed:', err);
+//       setError(err);
+//     }
+//   };
+
+//   return { engine: globalEngine, peerIds, isJoined, leaveChannel, error };
+// };
+
+// export default useAgoraEngine;
+//           config.token,
+//           config.channelName,
+//           config.uid,
+//           { clientRoleType: ClientRoleType.ClientRoleBroadcaster }
+//         );
+//         console.log('Join channel command sent');
+//       } catch (error) {
+//         console.error('Engine setup or join failed:', error);
+//         setError(error);
+//         onError(error);
+//       }
+//     };
+
+//     init();
+
+//     return () => {
+//       console.log('Component unmounting, engine persists');
+//     };
+//   }, [config, onJoinSuccess, onUserJoined, onUserOffline, onError]);
+
+//   const leaveChannel = async () => {
+//     try {
+//       if (globalEngine && isJoined) {
+//         await globalEngine.leaveChannel();
+//         console.log('Channel left successfully');
+//         setIsJoined(false);
+//         setPeerIds([]);
+//       }
+//     } catch (err) {
+//       console.error('Leave channel failed:', err);
+//       setError(err);
+//     }
+//   };
+
+//   return { engine: globalEngine, peerIds, isJoined, leaveChannel, error };
+// };
+
+// export default useAgoraEngine;
+//           config.token,
+//           config.channelName,
+//           config.uid,
+//           { clientRoleType: ClientRoleType.ClientRoleBroadcaster }
+//         );
+//         console.log('Join channel command sent');
+//       } catch (error) {
+//         console.error('Engine setup or join failed:', error);
+//         setError(error);
+//         onError(error);
+//       }
+//     };
+
+//     init();
+
+//     return () => {
+//       console.log('Component unmounting, engine persists');
+//     };
+//   }, [config, onJoinSuccess, onUserJoined, onUserOffline, onError]);
+
+//   const leaveChannel = async () => {
+//     try {
+//       if (globalEngine && isJoined) {
+//         await globalEngine.leaveChannel();
+//         console.log('Channel left successfully');
+//         setIsJoined(false);
+//         setPeerIds([]);
+//       }
+//     } catch (err) {
+//       console.error('Leave channel failed:', err);
+//       setError(err);
+//     }
+//   };
+
+//   return { engine: globalEngine, peerIds, isJoined, leaveChannel, error };
+// };
+
+// export default useAgoraEngine;
+//           config.token,
+//           config.channelName,
+//           config.uid,
+//           { clientRoleType: ClientRoleType.ClientRoleBroadcaster }
+//         );
+//         console.log('Join channel command sent');
+//       } catch (error) {
+//         console.error('Engine setup or join failed:', error);
+//         setError(error);
+//         onError(error);
+//       }
+//     };
+
+//     init();
+
+//     return () => {
+//       console.log('Component unmounting, engine persists');
+//     };
+//   }, [config, onJoinSuccess, onUserJoined, onUserOffline, onError]);
+
+//   const leaveChannel = async () => {
+//     try {
+//       if (globalEngine && isJoined) {
+//         await globalEngine.leaveChannel();
+//         console.log('Channel left successfully');
+//         setIsJoined(false);
+//         setPeerIds([]);
+//       }
+//     } catch (err) {
+//       console.error('Leave channel failed:', err);
+//       setError(err);
+//     }
+//   };
+
+//   return { engine: globalEngine, peerIds, isJoined, leaveChannel, error };
+// };
+
+// export default useAgoraEngine;
+//           config.token,
+//           config.channelName,
+//           config.uid,
+//           { clientRoleType: ClientRoleType.ClientRoleBroadcaster }
+//         );
+//         console.log('Join channel command sent');
+//       } catch (error) {
+//         console.error('Engine setup or join failed:', error);
+//         setError(error);
+//         onError(error);
+//       }
+//     };
+
+//     init();
+
+//     return () => {
+//       console.log('Component unmounting, engine persists');
+//     };
+//   }, [config, onJoinSuccess, onUserJoined, onUserOffline, onError]);
+
+//   const leaveChannel = async () => {
+//     try {
+//       if (globalEngine && isJoined) {
+//         await globalEngine.leaveChannel();
+//         console.log('Channel left successfully');
+//         setIsJoined(false);
+//         setPeerIds([]);
+//       }
+//     } catch (err) {
+//       console.error('Leave channel failed:', err);
+//       setError(err);
+//     }
+//   };
+
+//   return { engine: globalEngine, peerIds, isJoined, leaveChannel, error };
+// };
+
+// export default useAgoraEngine;
+//           config.token,
+//           config.channelName,
+//           config.uid,
+//           { clientRoleType: ClientRoleType.ClientRoleBroadcaster }
+//         );
+//         console.log('Join channel command sent');
+//       } catch (error) {
+//         console.error('Engine setup or join failed:', error);
+//         setError(error);
+//         onError(error);
+//       }
+//     };
+
+//     init();
+
+//     return () => {
+//       console.log('Component unmounting, engine persists');
+//     };
+//   }, [config, onJoinSuccess, onUserJoined, onUserOffline, onError]);
+
+//   const leaveChannel = async () => {
+//     try {
+//       if (globalEngine && isJoined) {
+//         await globalEngine.leaveChannel();
+//         console.log('Channel left successfully');
+//         setIsJoined(false);
+//         setPeerIds([]);
+//       }
+//     } catch (err) {
+//       console.error('Leave channel failed:', err);
+//       setError(err);
+//     }
+//   };
+
+//   return { engine: globalEngine, peerIds, isJoined, leaveChannel, error };
+// };
+
+// export default useAgoraEngine;
+//           config.token,
+//           config.channelName,
+//           config.uid,
+//           { clientRoleType: ClientRoleType.ClientRoleBroadcaster }
+//         );
+//         console.log('Join channel command sent');
+//       } catch (error) {
+//         console.error('Engine setup or join failed:', error);
+//         setError(error);
+//         onError(error);
+//       }
+//     };
+
+//     init();
+
+//     return () => {
+//       console.log('Component unmounting, engine persists');
+//     };
+//   }, [config, onJoinSuccess, onUserJoined, onUserOffline, onError]);
+
+//   const leaveChannel = async () => {
+//     try {
+//       if (globalEngine && isJoined) {
+//         await globalEngine.leaveChannel();
+//         console.log('Channel left successfully');
+//         setIsJoined(false);
+//         setPeerIds([]);
+//       }
+//     } catch (err) {
+//       console.error('Leave channel failed:', err);
+//       setError(err);
+//     }
+//   };
+
+//   return { engine: globalEngine, peerIds, isJoined, leaveChannel, error };
+// };
+
+// export default useAgoraEngine;
+//           config.token,
+//           config.channelName,
+//           config.uid,
+//           { clientRoleType: ClientRoleType.ClientRoleBroadcaster }
+//         );
+//         console.log('Join channel command sent');
+//       } catch (error) {
+//         console.error('Engine setup or join failed:', error);
+//         setError(error);
+//         onError(error);
+//       }
+//     };
+
+//     init();
+
+//     return () => {
+//       console.log('Component unmounting, engine persists');
+//     };
+//   }, [config, onJoinSuccess, onUserJoined, onUserOffline, onError]);
+
+//   const leaveChannel = async () => {
+//     try {
+//       if (globalEngine && isJoined) {
+//         await globalEngine.leaveChannel();
+//         console.log('Channel left successfully');
+//         setIsJoined(false);
+//         setPeerIds([]);
+//       }
+//     } catch (err) {
+//       console.error('Leave channel failed:', err);
+//       setError(err);
+//     }
+//   };
+
+//   return { engine: globalEngine, peerIds, isJoined, leaveChannel, error };
+// };
+
+// export default useAgoraEngine;
+//           config.token,
+//           config.channelName,
+//           config.uid,
+//           { clientRoleType: ClientRoleType.ClientRoleBroadcaster }
+//         );
+//         console.log('Join channel command sent');
+//       } catch (error) {
+//         console.error('Engine setup or join failed:', error);
+//         setError(error);
+//         onError(error);
+//       }
+//     };
+
+//     init();
+
+//     return () => {
+//       console.log('Component unmounting, engine persists');
+//     };
+//   }, [config, onJoinSuccess, onUserJoined, onUserOffline, onError]);
+
+//   const leaveChannel = async () => {
+//     try {
+//       if (globalEngine && isJoined) {
+//         await globalEngine.leaveChannel();
+//         console.log('Channel left successfully');
+//         setIsJoined(false);
+//         setPeerIds([]);
+//       }
+//     } catch (err) {
+//       console.error('Leave channel failed:', err);
+//       setError(err);
+//     }
+//   };
+
+//   return { engine: globalEngine, peerIds, isJoined, leaveChannel, error };
+// };
+
+// export default useAgoraEngine;
+//           config.token,
+//           config.channelName,
+//           config.uid,
+//           { clientRoleType: ClientRoleType.ClientRoleBroadcaster }
+//         );
+//         console.log('Join channel command sent');
+//       } catch (error) {
+//         console.error('Engine setup or join failed:', error);
+//         setError(error);
+//         onError(error);
+//       }
+//     };
+
+//     init();
+
+//     return () => {
+//       console.log('Component unmounting, engine persists');
+//     };
+//   }, [config, onJoinSuccess, onUserJoined, onUserOffline, onError]);
+
+//   const leaveChannel = async () => {
+//     try {
+//       if (globalEngine && isJoined) {
+//         await globalEngine.leaveChannel();
+//         console.log('Channel left successfully');
+//         setIsJoined(false);
+//         setPeerIds([]);
+//       }
+//     } catch (err) {
+//       console.error('Leave channel failed:', err);
+//       setError(err);
+//     }
+//   };
+
+//   return { engine: globalEngine, peerIds, isJoined, leaveChannel, error };
+// };
+
+// export default useAgoraEngine;
+//           config.token,
+//           config.channelName,
+//           config.uid,
+//           { clientRoleType: ClientRoleType.ClientRoleBroadcaster }
+//         );
+//         console.log('Join channel command sent');
+//       } catch (error) {
+//         console.error('Engine setup or join failed:', error);
+//         setError(error);
+//         onError(error);
+//       }
+//     };
+
+//     init();
+
+//     return () => {
+//       console.log('Component unmounting, engine persists');
+//     };
+//   }, [config, onJoinSuccess, onUserJoined, onUserOffline, onError]);
+
+//   const leaveChannel = async () => {
+//     try {
+//       if (globalEngine && isJoined) {
+//         await globalEngine.leaveChannel();
+//         console.log('Channel left successfully');
+//         setIsJoined(false);
+//         setPeerIds([]);
+//       }
+//     } catch (err) {
+//       console.error('Leave channel failed:', err);
+//       setError(err);
+//     }
+//   };
+
+//   return { engine: globalEngine, peerIds, isJoined, leaveChannel, error };
+// };
+
+// export default useAgoraEngine;

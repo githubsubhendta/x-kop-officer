@@ -17,6 +17,8 @@ import AudioScreen from '../Screens/videoCall/AudioScreen.jsx';
 import VideoCallScreen from '../Screens/videoCall/VideoCallScreen.jsx';
 import ParantWrapperProvider from '../shared/ParantWrapperProvider.jsx';
 import ChatScreen from '../Screens/Chat.Screen.jsx';
+import { CallProvider } from '../context/callContext.js';
+import CallPopup from '../Components/callPopup/FloatingCallPopup.jsx';
 
 const Stack = createStackNavigator();
 
@@ -27,6 +29,8 @@ const AppStack = () => {
     <>
       <FirebaseProvider>
         <WebSocketProvider>
+        <CallProvider>
+          <CallPopup />
           <ParantWrapperProvider>
             <Stack.Navigator
               initialRouteName={!whatwedoStatus ? 'WhatWeDoScreen' : 'Parent'}
@@ -93,6 +97,7 @@ const AppStack = () => {
               />
             </Stack.Navigator>
           </ParantWrapperProvider>
+          </CallProvider>
         </WebSocketProvider>
       </FirebaseProvider>
     </>

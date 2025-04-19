@@ -12,6 +12,7 @@ import {useNetwork} from './NetworkProvider';
 
 const WebSocketContext = createContext();
 import {navigate, reset} from '../navigation/NavigationService.js';
+import { useCall } from '../context/callContext.js';
 
 export const WebSocketProvider = ({children}) => {
   const [webSocket, setWebSocket] = useState(null);
@@ -101,6 +102,7 @@ export const WebSocketProvider = ({children}) => {
 
       webSocket.on('appyHandsup', data => {
         setCallReceiver(false);
+             
         if (data.type == 'call_reject') {
           // reset(0,[{
           //   name: "Parent",
