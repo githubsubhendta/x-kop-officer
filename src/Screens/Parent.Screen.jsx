@@ -16,10 +16,12 @@ import {SvgXml} from 'react-native-svg';
 import {View, BackHandler, Alert, TouchableOpacity, Text} from 'react-native';
 import ContactScreen from './Contact.Screen';
 import {useNetwork} from '../shared/NetworkProvider';
+import { useCall } from '../context/callContext';
 
 const Tab = createBottomTabNavigator();
 
 const ParentScreen = ({navigation}) => {
+  const {handleNavigationStateChange} = useCall();
   const [backPressed, setBackPressed] = useState(0);
   const webviewRef = useRef(null);
   const [selectedTab, setSelectedTab] = useState('Home');
@@ -79,7 +81,7 @@ const ParentScreen = ({navigation}) => {
     const backAction = () => {
       const state = navigation.getState();
       const currentRoute = state.routes[state.index].name;
-
+      handleNavigationStateChang(currentRoute);
       if (currentRoute === 'Parent' && selectedTab !== 'Home') {
         navigation.navigate('Home');
         handleTabPress('Home');

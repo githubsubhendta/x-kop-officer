@@ -1,5 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  ChannelProfileType,
+  ClientRoleType,
+  RtcSurfaceView,
+  createAgoraRtcEngine,
+} from 'react-native-agora';
+import {
   View,
   Text,
   TouchableOpacity,
@@ -13,7 +19,7 @@ import {
   BackHandler,
 } from 'react-native';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import { SvgXml } from 'react-native-svg';
+import Svg, { Path, SvgXml } from 'react-native-svg';
 import RNFS from 'react-native-fs';
 import {
   SVG_arrow_back,
@@ -22,6 +28,8 @@ import {
   SVG_request_video,
   SVG_speaker,
   SVG_speakeroff,
+  SVG_stop_camera,
+  SVG_switch_camera,
   SVG_unmute_mic,
 } from './../../Utils/SVGImage.js';
 import { useWebSocket } from '../../shared/WebSocketProvider.jsx';
@@ -29,61 +37,59 @@ import ChatModal from '../../Components/chat/ChatModal.jsx';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import CustomModal from '../../Components/CustomModal.jsx';
 import { useCall } from '../../context/callContext.js';
-import { useFocusEffect } from '@react-navigation/native';
+import { navigate } from '../../navigation/NavigationService.js';
 
 const { width, height } = Dimensions.get('window');
 
 const AudioScreen = ({ route, navigation }) => {
-  const { config, mobile, chatId, userInfo } = route.params || {};
+  const configuration = route.params || {};
   const { webSocket, leave } = useWebSocket();
   const {
     startCall,
+    callDuration,
     minimizeCall,
     endCall: contextEndCall,
     activeCall,
     isMinimized,
+    switchToVideoCall: swichVideo,
     engine,
     peerIds,
-    isJoined
+    isJoined,
+    isVideoEnabled
   } = useCall();
-
-  // Handle hardware back button
-  useEffect(() => {
-    const handleBackButton = () => {
-      if (activeCall && navigation.canGoBack()) {
-        navigation.goBack();
-        return true;
-      }
-      return false;
-    };
-
-    BackHandler.addEventListener('hardwareBackPress', handleBackButton);
-    return () => BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
-  }, [navigation, activeCall]);
-
-
 
 
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeakerEnabled, setIsSpeakerEnabled] = useState(true);
-  // Using isJoined from CallContext for connection status
+
   const [modelChat, setModelChat] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [callDuration, setCallDuration] = useState('00:00:00');
+
   const [showVideoCallModal, setShowVideoCallModal] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isCameraOn, setCameraOn] = useState(true);
+  const [connectionStatus, setConnectionStatus] = useState('Not Connected');
+
 
   useEffect(() => {
-    // Only start a new call if we don't have an active call and engine isn't initialized
+    if (isJoined) {
+      setConnectionStatus('Connected');
+
+      console.log('connected', isJoined);
+    }
+  }, [isJoined]);
+
+
+  useEffect(() => {
+
     if (!activeCall && !engine.current) {
       console.log('No active call, starting new call');
-      startCall({ config, mobile, chatId, userInfo, callDuration });
+      startCall({ configuration, callDuration });
     } else {
       console.log('Active call exists, not restarting - isMinimized:', isMinimized);
     }
+  }, [activeCall, configuration, callDuration, startCall, engine]);
 
-    // Connection status is now handled by isJoined from CallContext
-  }, [activeCall, config, mobile, chatId, userInfo, callDuration, startCall, engine]);
 
   const requestPermissions = useCallback(async () => {
     if (Platform.OS === 'android') {
@@ -129,83 +135,40 @@ const AudioScreen = ({ route, navigation }) => {
     requestPermissions();
   }, [requestPermissions]);
 
+  useEffect(() => {
+    if (configuration != undefined && Object.keys(configuration).length) {
+      console.log(configuration, 'Calling startCall...');
+      startCall(configuration);
+    }
+  }, [configuration]);
+
+  const handleVideoCallAnswered = async () => {
+    setShowVideoCallModal(false);
+    webSocket.emit('VideoCallanswerCall', { callerId: configuration.mobile });
+    swichVideo();
+  };
 
   useEffect(() => {
-    const handleVideoCallAnswered = async () => {
-      console.log('VideoCallAnswered received');
-      await engine.current?.leaveChannel();
-      navigation.navigate('VideoCallScreen', { config, mobile, userInfo, chatId });
-    };
-
-    webSocket.on('VideoCallAnswered', handleVideoCallAnswered);
-
-
-    const handleHandsup = () => {
-      contextEndCall();
-    };
-
-    webSocket.on('appyHandsup', handleHandsup);
-
-    return () => {
-      webSocket.off('VideoCallAnswered', handleVideoCallAnswered);
-      webSocket.off('appyHandsup', handleHandsup);
-    };
-  }, [engine, navigation, config, mobile, userInfo, chatId]);
-
-  useEffect(() => {
-    webSocket.on('newVideoCall', () => setShowVideoCallModal(true));
-    webSocket.on('updateCallDuration', data => {
-      setCallDuration(data.callDuration);
-      if (activeCall) {
-        startCall({ ...activeCall, callDuration: data.callDuration });
-      }
+    webSocket.on('newVideoCall', createTwoButtonAlert);
+    webSocket.on('VideoCallAnswered', async () => {
+      swichVideo();
     });
     return () => {
-      webSocket.off('newVideoCall')
-      webSocket.off('updateCallDuration');
+      webSocket.off('newVideoCall', createTwoButtonAlert);
+      webSocket.off('VideoCallAnswered');
     };
-  }, []);
+  }, [webSocket, engine, createTwoButtonAlert, navigation, configuration]);
 
-  // const handleNavigation = useCallback(() => {
-  //   console.log('handleNavigation triggered');
-  //   minimizeCall();
-  //   setTimeout(() => {
-  //     navigation.goBack();
-  //     console.log('Navigated back from AudioScreen');
-  //   }, 100);
-  // }, [minimizeCall, navigation]);
-
-  // Handle device back button
-  // useEffect(() => {
-  //   const backHandler = BackHandler.addEventListener(
-  //     'hardwareBackPress',
-  //     () => {
-  //       if (activeCall) {
-  //         console.log('Hardware back button pressed, minimizing');
-  //         minimizeCall();
-  //         navigation.goBack();
-  //         return true; 
-  //       }
-  //       return false;
-  //     },
-  //   );
-
-  //   return () => backHandler.remove();
-  // }, [activeCall, minimizeCall, navigation]);
+  
 
   const endCallHandler = useCallback(async () => {
-    console.log('endCallHandler triggered');
-    if (engine.current) {
-      await engine.current.leaveChannel();
-      engine.current.release();
-      engine.current = null;
+    try {
+      contextEndCall();
+      navigate('EndCallScreen');
+    } catch (err) {
+      console.error('Error ending call:', err);
     }
-    await contextEndCall();
-    // Only navigate back if we can
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    }
-  }, []);
+  }, [engine, leave, navigation]);
 
   const toggleMute = useCallback(async () => {
     if (engine.current) {
@@ -223,11 +186,17 @@ const AudioScreen = ({ route, navigation }) => {
 
   const switchToVideoCall = useCallback(async () => {
     if (engine.current) {
-      webSocket.emit('videocall', { calleeId: mobile });
+      webSocket.emit('videocall', { calleeId: configuration.mobile });
     }
-  }, [engine, webSocket, mobile]);
+  }, [engine, webSocket, configuration]);
 
+  const createTwoButtonAlert = () => {
+    setShowVideoCallModal(true);
+  };
 
+  const handleVideoCallModalClose = () => {
+    setShowVideoCallModal(false);
+  };
 
   const startRecording = async () => {
     if (!engine.current) return;
@@ -264,45 +233,17 @@ const AudioScreen = ({ route, navigation }) => {
     return unsubscribe;
   }, [activeCall, isMinimized, minimizeCall]);
 
-  useEffect(() => {
-    webSocket.on('newVideoCall', () => setShowVideoCallModal(true));
-    webSocket.on('VideoCallAnswered', async () => {
-      await engine.current?.leaveChannel();
-      navigation.navigate('VideoCallScreen', { config, mobile, userInfo, chatId });
-    });
-    webSocket.on('updateCallDuration', data => {
-      setCallDuration(data.callDuration);
-      if (activeCall) {
-        startCall({ ...activeCall, callDuration: data.callDuration });
-      }
-    });
-
-    return () => {
-      webSocket.off('newVideoCall');
-      webSocket.off('VideoCallAnswered');
-      webSocket.off('updateCallDuration');
-    };
-  }, [
-    webSocket,
-    engine,
-    navigation,
-    config,
-    mobile,
-    userInfo,
-    chatId,
-    activeCall,
-    startCall,
-  ]);
+  const handleClose = useCallback(() => setModelChat(false), []);
 
   const chatModal = useMemo(
     () => (
       <ChatModal
-        chatId={chatId}
+        chatId={configuration.chatId}
         isVisible={modelChat}
-        onClose={() => setModelChat(false)}
+        onClose={handleClose}
       />
     ),
-    [chatId, modelChat],
+    [configuration, modelChat, handleClose],
   );
 
   if (isMinimized) {
@@ -310,134 +251,354 @@ const AudioScreen = ({ route, navigation }) => {
     return null;
   }
 
-  return (
-    <View style={styles.container}>
-      {!isJoined ? (
-        <Text style={styles.connectionStatus}>Connecting...</Text>
-      ) : (
-        <View style={styles.mainContent}>
-          <View style={styles.endCallButton}>
-            {/* <TouchableOpacity onPress={handleNavigation}>
-              <SvgXml xml={SVG_arrow_back} width={30} height={30} />
-            </TouchableOpacity> */}
-            <TouchableOpacity onPress={async () => {
-              endCallHandler()
-              // if (engine?.current) {
-              //   await engine.current.leaveChannel();
-              //   engine.current.release();
-              //   engine.current = null;
-              //   contextEndCall();
-              //   leave();
-              //   navigation.goBack();
-              // }
-            }}>
-              <SvgXml xml={SVG_hangout_red} width={80} height={80} />
-            </TouchableOpacity>
+  const toggleCamera = () => {
+    if (isCameraOn) {
+      engine.current?.enableLocalVideo(false);
+      engine.current?.muteLocalVideoStream(true);
+    } else {
+      engine.current?.enableLocalVideo(true);
+      engine.current?.muteLocalVideoStream(false);
+    }
+    setCameraOn(prev => !prev);
+  };
+
+  const switchCamera = () => {
+    +engine.current?.switchCamera();
+  };
+
+
+  const _renderRemoteVideos = () => {
+    if (peerIds.length > 0) {
+      const id = peerIds[0];
+      return (
+        <RtcSurfaceView style={styles.remote} canvas={{ uid: id }} key={id} />
+      );
+    } else {
+      return <Text style={styles.text}>No remote video</Text>;
+    }
+  };
+
+
+  const _renderVideos = () => (
+    <View style={styles.fullView}>
+      <View style={styles.splitContainer}>
+        <View style={styles.remoteContainer}>
+          <View style={styles.counterContainerVideo}>
+            <Text style={styles.callDurationVideo}>{callDuration} mins left</Text>
           </View>
-          <View style={styles.infoContainer}>
-            <Image
-              source={
-                userInfo?.avatar
-                  ? { uri: userInfo?.avatar }
-                  : require('./../../images/book2.jpg')
-              }
-              style={styles.profileImage}
-            />
-            <View style={styles.textContainer}>
-              <Text style={styles.name}>{userInfo?.name}</Text>
-              <Text style={styles.title}>General Offences</Text>
-              <Text style={styles.status}>Call in Progress</Text>
-              <View style={styles.counterContainer}>
-                <Text style={styles.callDuration}>{callDuration} mins left</Text>
+          {_renderRemoteVideos()}
+        </View>
+  
+        {isCameraOn ? (
+          <View style={styles.localContainer}>
+            <RtcSurfaceView style={styles.local} canvas={{ uid: 0 }} />
+          </View>
+        ) : (
+          <View style={styles.localContainer2}>
+            <Svg width={50} height={50} viewBox="0 0 640 512" fill="white">
+              <Path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7l-86.4-67.7 13.8 9.2c9.8 6.5 22.4 7.2 32.9 1.6s16.9-16.4 16.9-28.2v-256c0-11.8-6.5-22.6-16.9-28.2s-23-5-32.9 1.6l-96 64L448 174.9v17.1v128v5.8l-32-25.1L416 128c0-35.3-28.7-64-64-64H113.9L38.8 5.1zM407 416.7L32.3 121.5c-.2 2.1-.3 4.3-.3 6.5v256c0 35.3 28.7 64 64 64h256c23.4 0 43.9-12.6 55-31.3z" />
+            </Svg>
+            <Text style={styles.cameraOffText}>Camera is off</Text>
+          </View>
+        )}
+      </View>
+      {/* Add Cross Button */}
+      <TouchableOpacity
+        style={styles.closeButton}
+        onPress={() => navigate('Parent')}>
+        <Svg width={30} height={30} viewBox="0 0 24 24" fill="#fff">
+          <Path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+        </Svg>
+      </TouchableOpacity>
+    </View>
+  );
+
+  return (
+
+    <>
+      {console.log('hello', isVideoEnabled.current)}
+
+      {isVideoEnabled.current === 'AUDIO' ? (
+        <View style={styles.container}>
+          <View style={styles.mainContent}>
+            <View style={styles.endCallButton}>
+
+              <TouchableOpacity onPress={async () => {
+                endCallHandler()
+              }}>
+                <SvgXml xml={SVG_hangout_red} width={80} height={80} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.infoContainer}>
+              <Image
+                source={
+                  configuration?.userInfo?.avatar
+                    ? { uri: configuration?.userInfo?.avatar }
+                    : require('./../../images/book2.jpg')
+                }
+                style={styles.profileImage}
+              />
+              <View style={styles.textContainer}>
+                <Text style={styles.name}>{configuration?.userInfo?.name}</Text>
+                <Text style={styles.title}>General Offences</Text>
+                <Text style={styles.status}>Call in Progress</Text>
+                <View style={styles.counterContainer}>
+                  <Text style={styles.callDuration}>{callDuration} mins left</Text>
+                </View>
               </View>
             </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.button} onPress={switchToVideoCall}>
+                <SvgXml xml={SVG_request_video} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={toggleMute}>
+                {isMuted ? <SvgXml xml={SVG_unmute_mic} /> : <SvgXml xml={SVG_mute_mic} />}
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={toggleSpeaker}>
+                {isSpeakerEnabled ? <SvgXml xml={SVG_speaker} /> : <SvgXml xml={SVG_speakeroff} />}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={isRecording ? stopRecording : () => setIsModalVisible(true)}
+              >
+                <Icon
+                  name={isRecording ? 'stop' : 'fiber-manual-record'}
+                  size={24}
+                  color={isRecording ? 'black' : 'red'}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.messageInputContainer}>
+              <TouchableOpacity
+                style={styles.InputContainer}
+                onPress={() => setModelChat(true)}
+              >
+                <TextInput
+                  style={styles.input}
+                  placeholder="Start Typing Here"
+                  placeholderTextColor="#888"
+                  editable={false}
+                />
+                <View style={styles.iconsContainer}>
+                  <View style={styles.iconButton}>
+                    <Icon name="attach-file" size={24} color="#888" />
+                  </View>
+                  <View style={styles.iconButton}>
+                    <Icon name="send" size={24} color="#888" />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </View>
+            {chatModal}
           </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={switchToVideoCall}>
-              <SvgXml xml={SVG_request_video} />
+
+
+          <CustomModal
+            isVisible={showVideoCallModal}
+            onClose={handleVideoCallModalClose}
+            message="Requesting for Video Call"
+            buttons={[
+              {
+                label: 'Cancel',
+                onPress: handleVideoCallModalClose,
+                color: 'gray',
+              },
+              {
+                label: 'OK',
+                onPress: handleVideoCallAnswered,
+              },
+            ]}
+          />
+
+          <CustomModal
+            isVisible={isModalVisible}
+            onClose={() => setIsModalVisible(false)}
+            message="Do you want to start recording?"
+            buttons={[
+              { label: 'Cancel', onPress: () => setIsModalVisible(false), color: 'gray' },
+              { label: 'OK', onPress: () => { setIsModalVisible(false); startRecording(); } },
+            ]}
+          />
+        </View>
+      ) : (
+        <View style={styles.max}>
+          {isJoined && _renderVideos()}
+          <View style={styles.buttonHolder}>
+            <TouchableOpacity onPress={toggleMute} style={styles.buttonVideo}>
+              {isMuted ? <SvgXml xml={SVG_mute_mic} /> : <SvgXml xml={SVG_unmute_mic} />}
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={toggleMute}>
-              {isMuted ? <SvgXml xml={SVG_unmute_mic} /> : <SvgXml xml={SVG_mute_mic} />}
+            <TouchableOpacity onPress={switchCamera} style={styles.buttonVideo}>
+              <SvgXml xml={SVG_switch_camera} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={toggleSpeaker}>
+            <TouchableOpacity onPress={endCallHandler} style={styles.buttonVideo}>
+              <SvgXml xml={SVG_hangout_red} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={toggleCamera} style={styles.buttonVideo}>
+              <SvgXml xml={isCameraOn ? SVG_stop_camera : SVG_stop_camera} className="mt-2" />
+            </TouchableOpacity>
+            <View>
+              <TouchableOpacity style={styles.buttonVideo} onPress={() => setModelChat(true)}>
+                <Svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 576 512"
+                  width={28}
+                  height={28}
+                  fill="#000"
+                >
+                  <Path d="M284 224.8a34.1 34.1 0 1 0 34.3 34.1A34.2 34.2 0 0 0 284 224.8zm-110.5 0a34.1 34.1 0 1 0 34.3 34.1A34.2 34.2 0 0 0 173.6 224.8zm220.9 0a34.1 34.1 0 1 0 34.3 34.1A34.2 34.2 0 0 0 394.5 224.8zm153.8-55.3c-15.5-24.2-37.3-45.6-64.7-63.6-52.9-34.8-122.4-54-195.7-54a406 406 0 0 0 -72 6.4 238.5 238.5 0 0 0 -49.5-36.6C99.7-11.7 40.9 .7 11.1 11.4A14.3 14.3 0 0 0 5.6 34.8C26.5 56.5 61.2 99.3 52.7 138.3c-33.1 33.9-51.1 74.8-51.1 117.3 0 43.4 18 84.2 51.1 118.1 8.5 39-26.2 81.8-47.1 103.5a14.3 14.3 0 0 0 5.6 23.3c29.7 10.7 88.5 23.1 155.3-10.2a238.7 238.7 0 0 0 49.5-36.6A406 406 0 0 0 288 460.1c73.3 0 142.8-19.2 195.7-54 27.4-18 49.1-39.4 64.7-63.6 17.3-26.9 26.1-55.9 26.1-86.1C574.4 225.4 565.6 196.4 548.3 169.5zM285 409.9a345.7 345.7 0 0 1 -89.4-11.5l-20.1 19.4a184.4 184.4 0 0 1 -37.1 27.6 145.8 145.8 0 0 1 -52.5 14.9c1-1.8 1.9-3.6 2.8-5.4q30.3-55.7 16.3-100.1c-33-26-52.8-59.2-52.8-95.4 0-83.1 104.3-150.5 232.8-150.5s232.9 67.4 232.9 150.5C517.9 342.5 413.6 409.9 285 409.9z" />
+                </Svg>
+              </TouchableOpacity>
+            </View>
+            {chatModal}
+            <TouchableOpacity onPress={toggleSpeaker} style={styles.buttonVideo}>
               {isSpeakerEnabled ? <SvgXml xml={SVG_speaker} /> : <SvgXml xml={SVG_speakeroff} />}
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={isRecording ? stopRecording : () => setIsModalVisible(true)}
-            >
-              <Icon
-                name={isRecording ? 'stop' : 'fiber-manual-record'}
-                size={24}
-                color={isRecording ? 'black' : 'red'}
-              />
-            </TouchableOpacity>
-            {/* <TouchableOpacity 
-              style={styles.button} 
-              onPress={handleNavigation}
-            >
-              <Text>Minimize</Text>
-            </TouchableOpacity> */}
           </View>
-          <View style={styles.messageInputContainer}>
-            <TouchableOpacity
-              style={styles.InputContainer}
-              onPress={() => setModelChat(true)}
-            >
-              <TextInput
-                style={styles.input}
-                placeholder="Start Typing Here"
-                placeholderTextColor="#888"
-                editable={false}
-              />
-              <View style={styles.iconsContainer}>
-                <View style={styles.iconButton}>
-                  <Icon name="attach-file" size={24} color="#888" />
-                </View>
-                <View style={styles.iconButton}>
-                  <Icon name="send" size={24} color="#888" />
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-          {chatModal}
         </View>
       )}
-
-      <CustomModal
-        isVisible={showVideoCallModal}
-        onClose={() => setShowVideoCallModal(false)}
-        message="Requesting for Video Call"
-        buttons={[
-          { label: 'Cancel', onPress: () => setShowVideoCallModal(false), color: 'gray' },
-          {
-            label: 'OK',
-            onPress: async () => {
-              setShowVideoCallModal(false);
-              webSocket.emit('VideoCallanswerCall', { callerId: mobile });
-              await engine.current?.leaveChannel();
-              setTimeout(() => {
-                navigation.navigate('VideoCallScreen', { config, mobile, chatId, userInfo });
-              }, 300);
-            },
-          },
-        ]}
-      />
-
-      <CustomModal
-        isVisible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
-        message="Do you want to start recording?"
-        buttons={[
-          { label: 'Cancel', onPress: () => setIsModalVisible(false), color: 'gray' },
-          { label: 'OK', onPress: () => { setIsModalVisible(false); startRecording(); } },
-        ]}
-      />
-    </View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  max: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  fullView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  splitContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  localContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+  },
+  local: {
+    width: '100%',
+    height: '100%',
+  },
+  counterContainerVideo: {
+    position: 'absolute',
+    top: 10,
+    left: 'auto', 
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    paddingVertical: 3,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    zIndex: 10,
+  },
+  callDurationVideo: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: 'medium',
+  },
+  remoteContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+  },
+
+  closeButton: {
+    position: 'absolute',
+    top: 5,
+    right: 20,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+   
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  remote: {
+    width: '100%',
+    height: '100%',
+  },
+  counterContainer: {
+    position: 'absolute',
+    top: 10,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    paddingVertical: 3,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+  },
+  callDuration: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: 'medium',
+  },
+  buttonHolder: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#fff',
+    paddingVertical: 10,
+  },
+  button: {
+    width: 45,
+    height: 45,
+    borderRadius: 31,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 2 },
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
+  },
+
+  buttonVideo: {
+    width: 50,
+    height: 50,
+    borderRadius: 31,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 2 },
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
+  },
+  text: {
+    color: 'black',
+  },
+  localContainer2: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+  },
+  cameraOffText: {
+    color: 'white',
+    alignItems: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#fff',

@@ -29,12 +29,14 @@ const AppStack = () => {
     <>
       <FirebaseProvider>
         <WebSocketProvider>
-        <CallProvider>
-          <CallPopup />
+         
           <ParantWrapperProvider>
+          <CallProvider>
+          <CallPopup/>
             <Stack.Navigator
               initialRouteName={!whatwedoStatus ? 'WhatWeDoScreen' : 'Parent'}
               screenOptions={{headerShown: false}}>
+               
               <Stack.Screen
                 name="WhatWeDoScreen"
                 component={WhatWeDoScreen}
@@ -96,8 +98,9 @@ const AppStack = () => {
                 options={{headerShown: false}}
               />
             </Stack.Navigator>
+            </CallProvider>
           </ParantWrapperProvider>
-          </CallProvider>
+          
         </WebSocketProvider>
       </FirebaseProvider>
     </>

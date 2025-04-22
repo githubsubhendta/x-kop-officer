@@ -6,7 +6,10 @@ import { SVG_hangout_red } from '../../Utils/SVGImage.js';
 import { useNavigationState } from '@react-navigation/native';
 
 const CallPopup = () => {
-  const { activeCall, isMinimized, maximizeCall, endCall } = useCall();
+  const { activeCall, isMinimized, maximizeCall, endCall,callDuration } = useCall();
+
+ 
+  
 
   const currentRouteName = useNavigationState((state) => {
     if (!state || !state.routes || state.index == null) return null;
@@ -29,9 +32,12 @@ const CallPopup = () => {
 
   if (
     !activeCall ||
+    !isMinimized || // Only show popup when minimized
     currentRouteName === 'AudioScreen' ||
-    currentRouteName === 'VideoCallScreen'
+    currentRouteName === 'VideoCallScreen' ||
+    currentRouteName === 'EndCallScreen'
   ) {
+    console.log('CallPopup: Not rendering due to conditions');
     return null;
   }
 
@@ -42,6 +48,7 @@ const CallPopup = () => {
           <Text style={styles.callerName}>
             {activeCall.userInfo?.name || 'On Call'}
           </Text>
+          <Text style={styles.callDuration}>{callDuration}</Text>
         </View>
         <TouchableOpacity onPress={endCall}>
           <SvgXml xml={SVG_hangout_red} width={40} height={40} />

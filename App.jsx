@@ -48,6 +48,7 @@ const App = () => {
   }, []);
 
   return (
+    
     <NavigationContainer
       ref={navigationRef}
       onReady={() => {
