@@ -57,7 +57,7 @@ const AccountScreen = ({navigation}) => {
         navigation.navigate('LoginScreen');
       }
     } catch (error) {
-      console.error('error:', error.response.message);
+      console.error('error:', error.response?.message);
     }
   };
 

@@ -11,3 +11,6 @@
 
 -keep class io.agora.** { *; }
 -keep class com.agora.** { *; }
+-keep class com.google.firebase.** { *; }
+-keep class com.google.firebase.messaging.** { *; }
+-keep class your.package.name.YourFirebaseMessagingService { *; }

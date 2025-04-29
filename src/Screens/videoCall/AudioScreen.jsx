@@ -159,7 +159,7 @@ const AudioScreen = ({ route, navigation }) => {
     };
   }, [webSocket, engine, createTwoButtonAlert, navigation, configuration]);
 
-  
+
 
   const endCallHandler = useCallback(async () => {
     try {
@@ -288,7 +288,7 @@ const AudioScreen = ({ route, navigation }) => {
           </View>
           {_renderRemoteVideos()}
         </View>
-  
+
         {isCameraOn ? (
           <View style={styles.localContainer}>
             <RtcSurfaceView style={styles.local} canvas={{ uid: 0 }} />
@@ -320,77 +320,83 @@ const AudioScreen = ({ route, navigation }) => {
 
       {isVideoEnabled.current === 'AUDIO' ? (
         <View style={styles.container}>
-          <View style={styles.mainContent}>
-            <View style={styles.endCallButton}>
-
-              <TouchableOpacity onPress={async () => {
-                endCallHandler()
-              }}>
-                <SvgXml xml={SVG_hangout_red} width={80} height={80} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.infoContainer}>
-              <Image
-                source={
-                  configuration?.userInfo?.avatar
-                    ? { uri: configuration?.userInfo?.avatar }
-                    : require('./../../images/book2.jpg')
-                }
-                style={styles.profileImage}
-              />
-              <View style={styles.textContainer}>
-                <Text style={styles.name}>{configuration?.userInfo?.name}</Text>
-                <Text style={styles.title}>General Offences</Text>
-                <Text style={styles.status}>Call in Progress</Text>
-                <View style={styles.counterContainer}>
-                  <Text style={styles.callDuration}>{callDuration} mins left</Text>
+          {connectionStatus !== 'Connected' ? (
+            <Text style={styles.connectionStatus}>{connectionStatus}</Text>
+          ) : (
+            <View style={styles.mainContent}>
+              <View style={styles.endCallButton}>
+                <TouchableOpacity onPress={() => navigate('Parent')}>
+                  <SvgXml xml={SVG_arrow_back} width={30} height={30} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={async () => {
+                  endCallHandler()
+                }}>
+                  <SvgXml xml={SVG_hangout_red} width={80} height={80} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.infoContainer}>
+                <Image
+                  source={
+                    configuration?.userInfo?.avatar
+                      ? { uri: configuration?.userInfo?.avatar }
+                      : require('./../../images/book2.jpg')
+                  }
+                  style={styles.profileImage}
+                />
+                <View style={styles.textContainer}>
+                  <Text style={styles.name}>{configuration?.userInfo?.name}</Text>
+                  <Text style={styles.title}>General Offences</Text>
+                  <Text style={styles.status}>Call in Progress</Text>
+                  <View style={styles.counterContainer}>
+                    <Text style={styles.callDuration}>{callDuration} mins left</Text>
+                  </View>
                 </View>
               </View>
-            </View>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.button} onPress={switchToVideoCall}>
-                <SvgXml xml={SVG_request_video} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.button} onPress={toggleMute}>
-                {isMuted ? <SvgXml xml={SVG_unmute_mic} /> : <SvgXml xml={SVG_mute_mic} />}
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.button} onPress={toggleSpeaker}>
-                {isSpeakerEnabled ? <SvgXml xml={SVG_speaker} /> : <SvgXml xml={SVG_speakeroff} />}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={isRecording ? stopRecording : () => setIsModalVisible(true)}
-              >
-                <Icon
-                  name={isRecording ? 'stop' : 'fiber-manual-record'}
-                  size={24}
-                  color={isRecording ? 'black' : 'red'}
-                />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.messageInputContainer}>
-              <TouchableOpacity
-                style={styles.InputContainer}
-                onPress={() => setModelChat(true)}
-              >
-                <TextInput
-                  style={styles.input}
-                  placeholder="Start Typing Here"
-                  placeholderTextColor="#888"
-                  editable={false}
-                />
-                <View style={styles.iconsContainer}>
-                  <View style={styles.iconButton}>
-                    <Icon name="attach-file" size={24} color="#888" />
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.button} onPress={switchToVideoCall}>
+                  <SvgXml xml={SVG_request_video} />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={toggleMute}>
+                  {isMuted ? <SvgXml xml={SVG_unmute_mic} /> : <SvgXml xml={SVG_mute_mic} />}
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={toggleSpeaker}>
+                  {isSpeakerEnabled ? <SvgXml xml={SVG_speaker} /> : <SvgXml xml={SVG_speakeroff} />}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={isRecording ? stopRecording : () => setIsModalVisible(true)}
+                >
+                  <Icon
+                    name={isRecording ? 'stop' : 'fiber-manual-record'}
+                    size={24}
+                    color={isRecording ? 'black' : 'red'}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.messageInputContainer}>
+                <TouchableOpacity
+                  style={styles.InputContainer}
+                  onPress={() => setModelChat(true)}
+                >
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Start Typing Here"
+                    placeholderTextColor="#888"
+                    editable={false}
+                  />
+                  <View style={styles.iconsContainer}>
+                    <View style={styles.iconButton}>
+                      <Icon name="attach-file" size={24} color="#888" />
+                    </View>
+                    <View style={styles.iconButton}>
+                      <Icon name="send" size={24} color="#888" />
+                    </View>
                   </View>
-                  <View style={styles.iconButton}>
-                    <Icon name="send" size={24} color="#888" />
-                  </View>
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </View>
+              {chatModal}
             </View>
-            {chatModal}
-          </View>
+          )}
 
 
           <CustomModal
@@ -489,7 +495,7 @@ const styles = StyleSheet.create({
   counterContainerVideo: {
     position: 'absolute',
     top: 10,
-    left: 'auto', 
+    left: 'auto',
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     paddingVertical: 3,
     paddingHorizontal: 12,
@@ -515,7 +521,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-   
+
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,

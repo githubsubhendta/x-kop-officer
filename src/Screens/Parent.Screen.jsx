@@ -81,7 +81,7 @@ const ParentScreen = ({navigation}) => {
     const backAction = () => {
       const state = navigation.getState();
       const currentRoute = state.routes[state.index].name;
-      handleNavigationStateChang(currentRoute);
+      handleNavigationStateChange(currentRoute);
       if (currentRoute === 'Parent' && selectedTab !== 'Home') {
         navigation.navigate('Home');
         handleTabPress('Home');

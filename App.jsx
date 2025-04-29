@@ -48,7 +48,7 @@ const App = () => {
   }, []);
 
   return (
-    
+
     <NavigationContainer
       ref={navigationRef}
       onReady={() => {
@@ -62,7 +62,7 @@ const App = () => {
           <SnackbarProvider>
             <LoadingProvider>
               <MainApp />
-             
+
             </LoadingProvider>
           </SnackbarProvider>
         </SafeAreaView>

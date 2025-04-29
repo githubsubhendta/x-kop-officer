@@ -1,7 +1,7 @@
 import { createNavigationContainerRef, StackActions, CommonActions } from '@react-navigation/native';
 import * as React from 'react';
 export const navigationRef = createNavigationContainerRef();
-export const isReadyRef = React.createRef();
+export const isReadyRef = React.createRef(); // Use plain object instead of createRef
 
 // export function navigate(name, params) {
 //   if (navigationRef.isReady()) {
@@ -14,8 +14,8 @@ export const isReadyRef = React.createRef();
 const navigationQueue = [];
 
 export function navigate(name, params) {
-  if (isReadyRef.current && navigationRef.current) {
-    navigationRef.current.navigate(name, params);
+  if (navigationRef.isReady()) {
+    navigationRef.navigate(name, params);
   } else {
     navigationQueue.push({ name, params });
   }
@@ -26,8 +26,7 @@ export function processNavigationQueue() {
     navigationQueue.forEach(({ name, params }) => {
       navigationRef.current.navigate(name, params);
     });
-    // Clear the queue after processing
-    navigationQueue.length = 0;
+    navigationQueue.length = 0; // Clear the queue
   }
 }
 
